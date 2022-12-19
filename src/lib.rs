@@ -1,14 +1,14 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+
+struct SymmetricGroup(order: u64) {
+    todo!();
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+struct AlternatingGroup(order: u64) {
+    todo!();
 }
+
+trait Group {
+    todo!();
+}
+
+

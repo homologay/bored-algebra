@@ -16,6 +16,48 @@ impl Add for Prime {
     }
 }
 
+///non-optimized euler phi/totient function
+fn euler_phi_preop(n: u64) -> u64 {
+    if (n == 1) || (n == 0) {
+        return 1;
+    } else {
+        return (1..n).map(|k| (gcd(k, n), k)).fold(
+            0,
+            |acc, (gcd, k)| {
+                if gcd == 1 {
+                    acc + 1
+                } else {
+                    acc
+                }
+            },
+        );
+    }
+}
+
+///computes max of two numbers. Returns a if a == b.
+fn max(a: u64, b: u64) -> u64 {
+    if a >= b {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+///computes min of two numbers. Returns a if a == b.
+fn min(a: u64, b: u64) -> u64 {
+    if a <= b {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+fn gcd(a: u64, b: u64) -> u64 {
+    (1..=min(a, b))
+        .map(|n| ((a % n == 0) && (b % n == 0), n))
+        .fold(1, |acc, (divides, n)| if divides { n } else { acc })
+}
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 struct IntegerModN {
     val: u64, // a representative for the class of val mod n
@@ -57,10 +99,13 @@ impl Sub for IntegerModN {
 
     fn sub(self, rhs: Self) -> Self {
         match self.n == rhs.n {
-            true => Self { val: (self.val + (-rhs).val) % self.n,
-                            n: self.n,
+            true => Self {
+                val: (self.val + (-rhs).val) % self.n,
+                n: self.n,
             },
-            false => {panic!();},
+            false => {
+                panic!();
+            }
         }
     }
 }
@@ -124,5 +169,23 @@ mod test {
         let num1 = IntegerModN { val: 1, n: 2 };
         let num2 = IntegerModN { val: 1, n: 3 };
         let num3 = num1 - num2;
+    }
+
+    #[test]
+    fn test_gcd() {
+        assert_eq!(gcd(0, 3), 1);
+        assert_eq!(gcd(3, 12), 3);
+        assert_eq!(gcd(12, 15), 3);
+        assert_eq!(gcd(20, 3), 1);
+        assert_eq!(gcd(18, 36), 18);
+    }
+
+    #[test]
+    fn test_euler_phi_preop() {
+        assert_eq!(euler_phi_preop(1), 1);
+        assert_eq!(euler_phi_preop(0), 1);
+        assert_eq!(euler_phi_preop(9), 6);
+        assert_eq!(euler_phi_preop(97), 96);
+        assert_eq!(euler_phi_preop(42), 12);
     }
 }

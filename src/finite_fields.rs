@@ -36,6 +36,14 @@ impl Mul for Prime {
     }
 }
 
+impl Iterator for Prime {
+    type Item = Self;
+
+    fn next(&mut self) -> Option<Self> {
+        todo!();
+    }
+}
+
 ///non-optimized euler phi/totient function
 pub fn euler_phi_preop(n: u64) -> u64 {
     if (n == 1) || (n == 0) {
@@ -153,6 +161,14 @@ impl Mul for IntegerModN {
     }
 }
 
+impl Iterator for IntegerModN {
+    type Item = Self;
+
+    fn next(&mut self) -> Option<Self> {
+        todo!();
+    }
+}
+
 ///an element of the field Z/pZ, where p is prime.
 #[derive(Debug, PartialEq, Clone, Copy)]
 struct IntegerModP {
@@ -199,6 +215,14 @@ impl Mul for IntegerModP {
 
     fn mul(self, rhs: Self) -> Self {
        todo!(); 
+    }
+}
+
+impl Iterator for IntegerModP {
+    type Item = Self;
+
+    fn next(&mut self) -> Option<Self> {
+        todo!();
     }
 }
 

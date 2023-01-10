@@ -1,7 +1,17 @@
 //! here lie traits for abstractions like Group, Ring, ...
 
-// Group should extend Add, Neg, Sub
+///Group
+trait Group::<Vec<T>> where T: Neg, Sub, Unit {
+    todo!();
+}
 
-// Ring should extend Group, Mul
+///Ring, a pretty one hopefully
+trait Ring::<T> where T: Group {
+    todo!();
+}
 
-// not really sure how to do this, maybe should read up my books on traits
+///The property of a set with a binary operation "add" having a unit
+trait Unit::<Vec<T>> where T: Add {
+    todo!();
+}
+

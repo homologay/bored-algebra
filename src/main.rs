@@ -1,6 +1,10 @@
 pub mod finite_fields;
+pub mod macros;
+pub mod permutations;
+pub mod traits;
+pub mod helpers;
 
-use crate::finite_fields::*;
+use crate::helpers::{gcd, euler_phi_preop};
 
 fn main() {
     println!("{}", gcd(43432342, 123124));

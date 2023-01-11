@@ -1,18 +1,19 @@
+//! here lie structs for finite fields
+
 use std::ops::{Add, Mul, Neg, Sub};
+use std::collections::HashSet;
+
+use crate::traits::{Associative, Unit, Magma, Invertible, Group, Commutative, AbelianGroup,};
 
 ///wrapper around u64 for primes
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
 struct Prime {
     val: u64,
 }
 
 impl Prime {
     fn new(candidate: u64) -> Option<Self> {
-        if is_prime(candidate) {
-            return Some(Self { val: candidate });
-        } else {
-            return None;
-        }
+        todo!(); 
     }
 }
 
@@ -44,60 +45,20 @@ impl Iterator for Prime {
     }
 }
 
-///non-optimized euler phi/totient function
-pub fn euler_phi_preop(n: u64) -> u64 {
-    if (n == 1) || (n == 0) {
-        return 1;
-    } else {
-        return (1..n).map(|k| (gcd(k, n), k)).fold(
-            0,
-            |acc, (gcd, k)| {
-                if gcd == 1 {
-                    acc + 1
-                } else {
-                    acc
-                }
-            },
-        );
-    }
-}
-
-///returns true if n is prime, false otherwise.
-pub fn is_prime(n: u64) -> bool {
-    euler_phi_preop(n) == n - 1
-}
-
-///computes max of two numbers. Returns a if a == b.
-pub fn max(a: u64, b: u64) -> u64 {
-    if a >= b {
-        return a;
-    } else {
-        return b;
-    }
-}
-
-///computes min of two numbers. Returns a if a == b.
-pub fn min(a: u64, b: u64) -> u64 {
-    if a <= b {
-        return a;
-    } else {
-        return b;
-    }
-}
-
-///the greatest common divisor of two positive integers.
-pub fn gcd(a: u64, b: u64) -> u64 {
-    (1..=min(a, b))
-        .map(|n| ((a % n == 0) && (b % n == 0), n))
-        .fold(1, |acc, (divides, n)| if divides { n } else { acc })
-}
-
 ///an element of the ring Z/nZ, where n may be composite.
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 struct IntegerModN {
     val: u64, // a representative for the class of val mod n
     n: u64,   // the order of the group
-              // NOTE: val < n always. important.
+}
+
+impl IntegerModN {
+    fn new(val: u64, n: u64) -> Self {
+        Self {
+            val: val % n,
+            n: n,
+        }
+    }
 }
 
 impl Add for IntegerModN {
@@ -161,13 +122,50 @@ impl Mul for IntegerModN {
     }
 }
 
-impl Iterator for IntegerModN {
-    type Item = Self;
+struct IntegersModN {
+    elements: HashSet<IntegerModN>,
+    order: u64,
+}
 
-    fn next(&mut self) -> Option<Self> {
+impl IntegersModN {
+    pub fn new(order: u64) -> Self {
         todo!();
     }
+
+    pub fn get_order(self) -> u64 {
+        self.order
+    }
 }
+
+impl Magma for IntegersModN {
+    type Element = IntegerModN;
+}
+
+impl Associative for IntegersModN {}
+
+impl Unit for IntegersModN {
+    type Base = Self;
+
+    fn unit(base: Self::Base) -> IntegerModN {
+         let order = base.get_order();
+         IntegerModN::new(0, order)
+    }
+}
+
+impl Invertible for IntegersModN {
+    type Base = Self;
+
+    fn inverse(k: IntegerModN) -> IntegerModN {
+        -k
+    }
+}
+
+impl Group for IntegersModN {}
+
+impl Commutative for IntegersModN {}
+
+impl AbelianGroup for IntegersModN {}
+
 
 ///an element of the field Z/pZ, where p is prime.
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -190,7 +188,7 @@ impl Add for IntegerModP {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-       todo!(); 
+        todo!();
     }
 }
 
@@ -198,7 +196,7 @@ impl Neg for IntegerModP {
     type Output = Self;
 
     fn neg(self) -> Self {
-       todo!(); 
+        todo!();
     }
 }
 
@@ -206,7 +204,7 @@ impl Sub for IntegerModP {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
-       todo!(); 
+        todo!();
     }
 }
 
@@ -214,7 +212,7 @@ impl Mul for IntegerModP {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-       todo!(); 
+        todo!();
     }
 }
 
@@ -332,31 +330,5 @@ mod test {
     #[should_panic]
     fn p_mul_invalid() {
         todo!();
-    }
-
-    #[test]
-    fn test_gcd() {
-        assert_eq!(gcd(0, 3), 1);
-        assert_eq!(gcd(3, 12), 3);
-        assert_eq!(gcd(12, 15), 3);
-        assert_eq!(gcd(20, 3), 1);
-        assert_eq!(gcd(18, 36), 18);
-    }
-
-    #[test]
-    fn test_euler_phi_preop() {
-        assert_eq!(euler_phi_preop(1), 1);
-        assert_eq!(euler_phi_preop(0), 1);
-        assert_eq!(euler_phi_preop(9), 6);
-        assert_eq!(euler_phi_preop(97), 96);
-        assert_eq!(euler_phi_preop(42), 12);
-    }
-
-    #[test]
-    fn test_is_prime() {
-        assert_eq!(is_prime(1), false);
-        assert_eq!(is_prime(2), true);
-        assert_eq!(is_prime(19), true);
-        assert_eq!(is_prime(15), false);
     }
 }

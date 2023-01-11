@@ -1,6 +1,6 @@
 ///element of S_n
 struct NCycle {
-    cycles: Vec<u64>, 
+    cycles: Vec<u64>,
     n: u64,
 }
 

@@ -1,19 +1,52 @@
 //! here lie structs for finite fields
 
-use std::ops::{Add, Mul, Neg, Sub};
 use std::collections::HashSet;
+use std::ops::{Add, Mul, Neg, Sub};
 
-use crate::traits::{Associative, Unit, Magma, Invertible, Group, Commutative, AbelianGroup,};
+use crate::helpers::is_prime;
+use crate::traits::{AbelianGroup, Associative, Commutative, Group, Invertible, Magma, Unit};
+
+pub struct PrimeGenerator {
+    curr: u64,
+    next: u64,
+}
+
+impl PrimeGenerator {
+    pub fn new() -> Self {
+        Self { curr: 2, next: 3 }
+    }
+}
+
+impl Iterator for PrimeGenerator {
+    type Item = u64;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.curr = self.next;
+
+        //uses the fact that all primes > 3 are of form 6k \pm 1
+        loop {
+            self.next += match self.next % 6 {
+                1 => 4,
+                _ => 2,
+            };
+
+            if is_prime(self.next) {
+                break;
+            }
+        }
+        Some(self.curr)
+    }
+}
 
 ///wrapper around u64 for primes
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
-struct Prime {
-    val: u64,
+pub struct Prime {
+    pub val: u64,
 }
 
 impl Prime {
-    fn new(candidate: u64) -> Option<Self> {
-        todo!(); 
+    fn new(candidate: u64) -> Self {
+        todo!();
     }
 }
 
@@ -21,9 +54,7 @@ impl Add for Prime {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        Self {
-            val: self.val + rhs.val,
-        }
+        Self::new(self.val + rhs.val)
     }
 }
 
@@ -31,9 +62,7 @@ impl Mul for Prime {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        Self {
-            val: self.val * rhs.val,
-        }
+        Self::new(self.val * rhs.val)
     }
 }
 
@@ -41,7 +70,16 @@ impl Iterator for Prime {
     type Item = Self;
 
     fn next(&mut self) -> Option<Self> {
-        todo!();
+        let mut val = self.val;
+
+        loop {
+            val += 1;
+            if is_prime(val) {
+                break;
+            }
+        }
+
+        Some(Self::new(val))
     }
 }
 
@@ -54,10 +92,7 @@ struct IntegerModN {
 
 impl IntegerModN {
     fn new(val: u64, n: u64) -> Self {
-        Self {
-            val: val % n,
-            n: n,
-        }
+        Self { val: val % n, n: n }
     }
 }
 
@@ -147,8 +182,8 @@ impl Unit for IntegersModN {
     type Base = Self;
 
     fn unit(base: Self::Base) -> IntegerModN {
-         let order = base.get_order();
-         IntegerModN::new(0, order)
+        let order = base.get_order();
+        IntegerModN::new(0, order)
     }
 }
 
@@ -165,7 +200,6 @@ impl Group for IntegersModN {}
 impl Commutative for IntegersModN {}
 
 impl AbelianGroup for IntegersModN {}
-
 
 ///an element of the field Z/pZ, where p is prime.
 #[derive(Debug, PartialEq, Clone, Copy)]

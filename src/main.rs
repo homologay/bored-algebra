@@ -1,12 +1,14 @@
 pub mod finite_fields;
+pub mod helpers;
 pub mod macros;
 pub mod permutations;
 pub mod traits;
-pub mod helpers;
 
-use crate::helpers::{gcd, euler_phi_preop};
+use crate::finite_fields::PrimeGenerator;
+use crate::helpers::{euler_phi_preop, gcd};
 
 fn main() {
-    println!("{}", gcd(43432342, 123124));
-    println!("{}", euler_phi_preop(234231));
+    for p in PrimeGenerator::new() {
+        println!("{}", p.to_string());
+    }
 }

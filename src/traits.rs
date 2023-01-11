@@ -1,4 +1,4 @@
-//! here lie traits for algebraic abstractions... (based on set theory) 
+//! here lie traits for algebraic abstractions... (based on set theory)
 
 use core::ops::{Add, Mul, Neg, Sub};
 use std::hash::Hash;
@@ -24,8 +24,9 @@ pub trait Associative: Magma {}
 pub trait Invertible {
     type Base: Magma;
 
-    fn inverse(elem: <<Self as Invertible>::Base as Magma>::Element) -> 
-        <<Self as Invertible>::Base as Magma>::Element;
+    fn inverse(
+        elem: <<Self as Invertible>::Base as Magma>::Element,
+    ) -> <<Self as Invertible>::Base as Magma>::Element;
 }
 
 pub trait Commutative: Magma {}
@@ -36,15 +37,13 @@ pub trait Monoid: Associative + Unit {}
 
 pub trait Loop: Invertible + Unit {}
 
-pub trait Group: Invertible + Associative + Unit {} 
+pub trait Group: Invertible + Associative + Unit {}
 
 pub trait AbelianGroup: Commutative + Group {}
 
 // getting into ring stuff...
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
 }

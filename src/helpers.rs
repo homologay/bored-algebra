@@ -58,7 +58,6 @@ pub fn gcd(a: u64, b: u64) -> u64 {
         .fold(1, |acc, (divides, n)| if divides { n } else { acc })
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use std::ops::{Add, Mul, Neg, Sub};
 
 use crate::helpers::is_prime;
-use crate::traits::{Group, Ring, Field};
+use crate::traits::{Field, Group, Ring};
 
 ///wrapper around u64 for primes
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
@@ -52,8 +52,7 @@ impl Add for IntegerModN {
 
     fn add(self, rhs: Self) -> Self {
         match self.n == rhs.n {
-            true => 
-        Self::new(self.val + rhs.val, self.n),
+            true => Self::new(self.val + rhs.val, self.n),
             false => panic!(),
         }
     }
@@ -133,7 +132,6 @@ impl Ring for IntegersModN {
     }
 }
 
-
 ///an element of the field Z/pZ, where p is prime.
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
 struct IntegerModP {
@@ -183,10 +181,10 @@ impl Mul for IntegerModP {
     }
 }
 
-///a polynomial with coefficients in a ring T 
+///a polynomial with coefficients in a ring T
 #[derive(Eq, PartialEq, Debug, Clone)]
 struct Polynomial<T: Add + Neg + Sub + Mul> {
-    core: Vec<T>,       //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on. 
+    core: Vec<T>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
 }
 
 impl<T: Add + Neg + Sub + Mul> Polynomial<T> {
@@ -235,7 +233,7 @@ struct PolynomialRing<T: Add + Neg + Sub + Mul> {
 
 //impl Ring for PolynomialRing ...
 
-///the field GF(q) for q = p^n for some prime p and positive integer n. 
+///the field GF(q) for q = p^n for some prime p and positive integer n.
 #[derive(Debug)]
 struct FiniteField {}
 

@@ -1,18 +1,17 @@
-//! here lie traits for algebraic abstractions... 
+//! here lie traits for algebraic abstractions...
 
 use core::ops::{Add, Mul, Neg, Sub};
-use std::hash::Hash;
 use std::collections::HashSet;
+use std::hash::Hash;
 
 pub trait Group {
     type Element: Eq + Hash + Add + Neg + Sub;
 
     //req'd
-    
+
     ///returns the unit of the group
     fn unit(set: HashSet<Self::Element>) -> Self::Element;
 
-    
     //optional
 
     ///returns the order of the group
@@ -32,7 +31,6 @@ pub trait Ring {
     ///returns the 1 of the ring
     fn multiplicative_unit(set: HashSet<Self::Element>) -> Self::Element;
 
-
     //optional
 
     ///returns any zero divisors of the ring
@@ -43,15 +41,11 @@ pub trait Ring {
     fn nilradical(&self) -> HashSet<Self::Element> {
         panic!("nilradical() is not implemented");
     }
-
 }
 
 pub trait Field: Ring {
-    
     fn multiplicative_inverse(elem: Self::Element) -> Self::Element;
-
 }
-
 
 #[cfg(test)]
 mod tests {

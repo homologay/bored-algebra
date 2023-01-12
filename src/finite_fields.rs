@@ -3,7 +3,10 @@
 use std::collections::HashSet;
 use std::ops::{Add, Mul, Neg, Sub};
 
-use crate::helpers::is_prime;
+use itertools::EitherOrBoth::{Both, Left, Right};
+use itertools::Itertools;
+
+use crate::helpers::{is_prime, max, min};
 use crate::traits::{Field, Group, Ring};
 
 ///wrapper around u64 for primes
@@ -13,24 +16,9 @@ pub struct Prime {
 }
 
 impl Prime {
+    // assumes candidate has already been confirmed as prime
     fn new(candidate: u64) -> Self {
-        todo!();
-    }
-}
-
-impl Add for Prime {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self {
-        Self::new(self.val + rhs.val)
-    }
-}
-
-impl Mul for Prime {
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self {
-        Self::new(self.val * rhs.val)
+        Self { val: candidate }
     }
 }
 
@@ -189,31 +177,44 @@ struct Polynomial<T: Add + Neg + Sub + Mul> {
 
 impl<T: Add + Neg + Sub + Mul> Polynomial<T> {
     fn from_vec(vec: Vec<T>) -> Self {
-        todo!();
+        Self { core: vec }
     }
 }
 
-impl<T: Add + Neg + Sub + Mul> Add for Polynomial<T> {
+impl<T: Add<Output = T> + Neg + Sub + Mul> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        todo!();
+        let sum = self
+            .core
+            .into_iter()
+            .zip_longest(rhs.core.into_iter())
+            .map(|elem| match elem {
+                Both(a, b) => a + b,
+                Left(b) => b,
+                Right(a) => a,
+            })
+            .collect::<Vec<T>>();
+
+        Self::from_vec(sum)
     }
 }
 
-impl<T: Add + Neg + Sub + Mul> Neg for Polynomial<T> {
+impl<T: Add + Neg<Output = T> + Sub + Mul> Neg for Polynomial<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
-        todo!();
+        let neg_core = self.core.into_iter().map(|elem| -elem).collect::<Vec<T>>();
+
+        Self::from_vec(neg_core)
     }
 }
 
-impl<T: Add + Neg + Sub + Mul> Sub for Polynomial<T> {
+impl<T: Add<Output = T> + Neg<Output = T> + Sub + Mul> Sub for Polynomial<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
-        todo!();
+        self + (-rhs)
     }
 }
 
@@ -307,41 +308,63 @@ mod test {
         let num2 = IntegerModN { val: 3, n: 6 };
         let num3 = num1 * num2;
     }
-    #[test]
-    fn p_add() {
-        todo!();
-    }
 
     #[test]
-    #[should_panic]
-    fn p_add_invalid() {
-        todo!();
-    }
+    fn polynomial_sum_difference() {
+        // over Z
+        // x + 1
+        let z1 = Polynomial::<i64>::from_vec(vec![1, 1]);
+        // 2x^2 - 1
+        let z2 = Polynomial::<i64>::from_vec(vec![-1, 0, 2]);
 
-    #[test]
-    fn p_neg() {
-        todo!();
-    }
+        // x + 1 + 2x^2 - 1 = 2x^2 + x
+        assert_eq!(
+            z1.clone() + z2.clone(),
+            Polynomial::<i64>::from_vec(vec![0, 1, 2])
+        );
 
-    #[test]
-    fn p_sub() {
-        todo!();
-    }
+        // x + 1 - (2x^2 - 1) = -2x^2 + x + 2
+        assert_eq!(
+            z1.clone() - z2.clone(),
+            Polynomial::<i64>::from_vec(vec![2, 1, -2])
+        );
 
-    #[test]
-    #[should_panic]
-    fn p_sub_invalid() {
-        todo!();
-    }
+        // over Z/4Z
+        // 1 + 3x + 2x^3
+        let mod1 = Polynomial::<IntegerModN>::from_vec(vec![
+            IntegerModN::new(1, 4),
+            IntegerModN::new(3, 4),
+            IntegerModN::new(0, 4),
+            IntegerModN::new(2, 4),
+        ]);
+        // x + 3
+        let mod2 = Polynomial::<IntegerModN>::from_vec(vec![
+            IntegerModN::new(3, 4),
+            IntegerModN::new(1, 4),
+        ]);
+        let mod_sum = mod1.clone() + mod2.clone();
+        let mod_diff = mod1.clone() - mod2.clone();
 
-    #[test]
-    fn p_mul() {
-        todo!();
-    }
+        // 1 + 3x + 2x^3 + x + 3 = 2x^3
+        assert_eq!(
+            mod_sum,
+            Polynomial::<IntegerModN>::from_vec(vec![
+                IntegerModN::new(0, 4),
+                IntegerModN::new(0, 4),
+                IntegerModN::new(0, 4),
+                IntegerModN::new(2, 4)
+            ])
+        );
 
-    #[test]
-    #[should_panic]
-    fn p_mul_invalid() {
-        todo!();
+        // 1 + 3x + 2x^3 - (x + 3) = 2 + 2x + 2x^3
+        assert_eq!(
+            mod_diff,
+            Polynomial::<IntegerModN>::from_vec(vec![
+                IntegerModN::new(2, 4),
+                IntegerModN::new(2, 4),
+                IntegerModN::new(0, 4),
+                IntegerModN::new(2, 4)
+            ])
+        );
     }
 }

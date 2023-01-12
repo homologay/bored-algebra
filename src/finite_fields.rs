@@ -4,39 +4,7 @@ use std::collections::HashSet;
 use std::ops::{Add, Mul, Neg, Sub};
 
 use crate::helpers::is_prime;
-use crate::traits::{AbelianGroup, Associative, Commutative, Group, Invertible, Magma, Unit};
-
-pub struct PrimeGenerator {
-    curr: u64,
-    next: u64,
-}
-
-impl PrimeGenerator {
-    pub fn new() -> Self {
-        Self { curr: 2, next: 3 }
-    }
-}
-
-impl Iterator for PrimeGenerator {
-    type Item = u64;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.curr = self.next;
-
-        //uses the fact that all primes > 3 are of form 6k \pm 1
-        loop {
-            self.next += match self.next % 6 {
-                1 => 4,
-                _ => 2,
-            };
-
-            if is_prime(self.next) {
-                break;
-            }
-        }
-        Some(self.curr)
-    }
-}
+use crate::traits::{Group, Ring, Field};
 
 ///wrapper around u64 for primes
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
@@ -66,23 +34,6 @@ impl Mul for Prime {
     }
 }
 
-impl Iterator for Prime {
-    type Item = Self;
-
-    fn next(&mut self) -> Option<Self> {
-        let mut val = self.val;
-
-        loop {
-            val += 1;
-            if is_prime(val) {
-                break;
-            }
-        }
-
-        Some(Self::new(val))
-    }
-}
-
 ///an element of the ring Z/nZ, where n may be composite.
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 struct IntegerModN {
@@ -100,12 +51,10 @@ impl Add for IntegerModN {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        Self {
-            val: (self.val + rhs.val) % self.n,
-            n: match self.n == rhs.n {
-                true => self.n,
-                false => panic!(),
-            },
+        match self.n == rhs.n {
+            true => 
+        Self::new(self.val + rhs.val, self.n),
+            false => panic!(),
         }
     }
 }
@@ -117,10 +66,7 @@ impl Neg for IntegerModN {
         if self.val == 0 {
             self
         } else {
-            Self {
-                val: self.n - self.val,
-                n: self.n,
-            }
+            Self::new(self.n - self.val, self.n)
         }
     }
 }
@@ -130,10 +76,7 @@ impl Sub for IntegerModN {
 
     fn sub(self, rhs: Self) -> Self {
         match self.n == rhs.n {
-            true => Self {
-                val: (self.val + (-rhs).val) % self.n,
-                n: self.n,
-            },
+            true => Self::new(self.val + (-rhs).val, self.n),
             false => {
                 panic!();
             }
@@ -146,10 +89,7 @@ impl Mul for IntegerModN {
 
     fn mul(self, rhs: Self) -> Self {
         match self.n == rhs.n {
-            true => Self {
-                val: (self.val * rhs.val) % self.n,
-                n: self.n,
-            },
+            true => Self::new(self.val * rhs.val, self.n),
             false => {
                 panic!();
             }
@@ -157,6 +97,7 @@ impl Mul for IntegerModN {
     }
 }
 
+#[derive(Debug)]
 struct IntegersModN {
     elements: HashSet<IntegerModN>,
     order: u64,
@@ -164,7 +105,15 @@ struct IntegersModN {
 
 impl IntegersModN {
     pub fn new(order: u64) -> Self {
-        todo!();
+        let mut set = HashSet::new();
+        for k in 0..order {
+            let k_mod_n = IntegerModN::new(k, order);
+            set.insert(k_mod_n);
+        }
+        Self {
+            elements: set,
+            order: order,
+        }
     }
 
     pub fn get_order(self) -> u64 {
@@ -172,37 +121,21 @@ impl IntegersModN {
     }
 }
 
-impl Magma for IntegersModN {
+impl Ring for IntegersModN {
     type Element = IntegerModN;
-}
 
-impl Associative for IntegersModN {}
+    fn additive_unit(set: HashSet<Self::Element>) -> Self::Element {
+        todo!();
+    }
 
-impl Unit for IntegersModN {
-    type Base = Self;
-
-    fn unit(base: Self::Base) -> IntegerModN {
-        let order = base.get_order();
-        IntegerModN::new(0, order)
+    fn multiplicative_unit(set: HashSet<Self::Element>) -> Self::Element {
+        todo!();
     }
 }
 
-impl Invertible for IntegersModN {
-    type Base = Self;
-
-    fn inverse(k: IntegerModN) -> IntegerModN {
-        -k
-    }
-}
-
-impl Group for IntegersModN {}
-
-impl Commutative for IntegersModN {}
-
-impl AbelianGroup for IntegersModN {}
 
 ///an element of the field Z/pZ, where p is prime.
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 struct IntegerModP {
     val: u64, // a representative for the class of val mod p
     p: Prime, // the order of the group
@@ -250,13 +183,61 @@ impl Mul for IntegerModP {
     }
 }
 
-impl Iterator for IntegerModP {
-    type Item = Self;
+///a polynomial with coefficients in a ring T 
+#[derive(Eq, PartialEq, Debug, Clone)]
+struct Polynomial<T: Add + Neg + Sub + Mul> {
+    core: Vec<T>,       //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on. 
+}
 
-    fn next(&mut self) -> Option<Self> {
+impl<T: Add + Neg + Sub + Mul> Polynomial<T> {
+    fn from_vec(vec: Vec<T>) -> Self {
         todo!();
     }
 }
+
+impl<T: Add + Neg + Sub + Mul> Add for Polynomial<T> {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self {
+        todo!();
+    }
+}
+
+impl<T: Add + Neg + Sub + Mul> Neg for Polynomial<T> {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        todo!();
+    }
+}
+
+impl<T: Add + Neg + Sub + Mul> Sub for Polynomial<T> {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self {
+        todo!();
+    }
+}
+
+impl<T: Add + Neg + Sub + Mul> Mul for Polynomial<T> {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self {
+        todo!();
+    }
+}
+
+///a polynomial ring with coefficients in a ring T
+#[derive(Debug)]
+struct PolynomialRing<T: Add + Neg + Sub + Mul> {
+    elements: HashSet<Polynomial<T>>,
+}
+
+//impl Ring for PolynomialRing ...
+
+///the field GF(q) for q = p^n for some prime p and positive integer n. 
+#[derive(Debug)]
+struct FiniteField {}
 
 #[cfg(test)]
 mod test {

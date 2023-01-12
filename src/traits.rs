@@ -1,47 +1,57 @@
-//! here lie traits for algebraic abstractions... (based on set theory)
+//! here lie traits for algebraic abstractions... 
 
 use core::ops::{Add, Mul, Neg, Sub};
 use std::hash::Hash;
+use std::collections::HashSet;
 
-///a trait to wrap (hash)sets with a binary operation "add"
-pub trait Magma {
-    type Element: Eq + Hash + Add;
+pub trait Group {
+    type Element: Eq + Hash + Add + Neg + Sub;
+
+    //req'd
+    
+    ///returns the unit of the group
+    fn unit(set: HashSet<Self::Element>) -> Self::Element;
+
+    
+    //optional
+
+    ///returns the order of the group
+    fn order(&self) -> u64 {
+        panic!("order() is not implemented");
+    }
 }
 
-// 'restriction' traits ...
+pub trait Ring {
+    type Element: Eq + Hash + Add + Neg + Sub + Mul;
 
-pub trait Unit {
-    type Base: Magma;
+    //req'd
 
-    //picks a distinguished element to act as a unit. As of now it is up to the trait implementor
-    //to make sure the unit actually has the properties of the unit, maybe I can figure out how to
-    //change this...
-    fn unit(base: Self::Base) -> <<Self as Unit>::Base as Magma>::Element;
+    ///returns the 0 of the ring
+    fn additive_unit(set: HashSet<Self::Element>) -> Self::Element;
+
+    ///returns the 1 of the ring
+    fn multiplicative_unit(set: HashSet<Self::Element>) -> Self::Element;
+
+
+    //optional
+
+    ///returns any zero divisors of the ring
+    fn zero_divisors(&self) -> HashSet<Self::Element> {
+        panic!("zero_divisors() is not implemented");
+    }
+
+    fn nilradical(&self) -> HashSet<Self::Element> {
+        panic!("nilradical() is not implemented");
+    }
+
 }
 
-pub trait Associative: Magma {}
+pub trait Field: Ring {
+    
+    fn multiplicative_inverse(elem: Self::Element) -> Self::Element;
 
-pub trait Invertible {
-    type Base: Magma;
-
-    fn inverse(
-        elem: <<Self as Invertible>::Base as Magma>::Element,
-    ) -> <<Self as Invertible>::Base as Magma>::Element;
 }
 
-pub trait Commutative: Magma {}
-
-// some aliases...
-
-pub trait Monoid: Associative + Unit {}
-
-pub trait Loop: Invertible + Unit {}
-
-pub trait Group: Invertible + Associative + Unit {}
-
-pub trait AbelianGroup: Commutative + Group {}
-
-// getting into ring stuff...
 
 #[cfg(test)]
 mod tests {

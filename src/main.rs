@@ -3,8 +3,9 @@ pub mod helpers;
 pub mod macros;
 pub mod permutations;
 pub mod traits;
+pub mod prime_generation;
 
-use crate::finite_fields::PrimeGenerator;
+use crate::prime_generation::PrimeGenerator;
 use crate::helpers::{euler_phi_preop, gcd};
 
 fn main() {

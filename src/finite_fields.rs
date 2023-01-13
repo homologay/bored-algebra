@@ -7,7 +7,7 @@ use itertools::EitherOrBoth::{Both, Left, Right};
 use itertools::Itertools;
 
 use crate::helpers::{is_prime, max, min};
-use crate::traits::{Zero, Field, Group, Ring};
+use crate::traits::{ZeroOneParam, ZeroNoParams, Zero, One, Field, Group, Ring};
 
 ///wrapper around u64 for primes
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
@@ -22,7 +22,7 @@ impl Prime {
     }
 }
 
-///an element of the ring Z/nZ, where n may be composite.
+///an element of the (set) Z/nZ, where n may be composite.
 #[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 struct IntegerModN {
     val: u64, // a representative for the class of val mod n
@@ -33,11 +33,42 @@ impl IntegerModN {
     fn new(val: u64, n: u64) -> Self {
         Self { val: val % n, n: n }
     }
+
+    fn get_order(&self) -> u64 {
+        self.n
+    }
 }
 
-//to implement Zero ... change to enum struct or zero? then have cases for operators .. ugh
-//or change trait, but idk how to do that to make it work with the struct as is...
-//Some() optional field???
+impl ZeroOneParam for IntegerModN {
+    fn zero(param: Option<u64>) {
+        match param {
+            Some(n) => Self::new(0, n),
+            None => panic!(),
+        }
+    }
+
+    fn set_zero(&mut self, order: Option<u64>) {
+        match order {
+            Some(n) => { *self = Zero::zero(n); },
+            None => panic!(),
+        }
+    }
+
+    fn is_zero(&self) -> bool {
+        let n = &self.get_order();
+        let zero = Self::zero(n);
+        if zero = self {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+impl Zero for IntegerModN {
+    type OneParam = Some(Self);
+    type NoParams = None;
+}
 
 impl Add for IntegerModN {
     type Output = Self;
@@ -223,28 +254,46 @@ impl<T: Add<Output = T> + Neg<Output = T> + Sub + Mul> Sub for Polynomial<T> {
     }
 }
 
-impl<T: Add<Output = T> + Neg + Sub + Mul<Output = T> + Zero> Mul for Polynomial<T> {
+impl<T: Add<Output = T> + Mul<Output = T> + Zero + Neg + Sub + Clone> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
+
+        //figure out what zero is
+        let zero = match (T::OneParam, T::NoParams) {
+            (Some(T), None) => T::zero(T::order()),
+            (None, Some(T)) => T::zero(),
+            _               => panic!(),
+        };
+
+        //degrees of the polynomials
         let self_degree = self.core.len() - 1;
         let rhs_degree = rhs.core.len() - 1;
         let product_degree = self_degree + rhs_degree;
 
         //coefficients for self in increasing deg order, padded with zeros till product_degree
-        let self_iter = self.core.iter().
-            chain([T::zero(); rhs_degree].into_iter());
+        let mut self_padding: Vec<T> = Vec::new();
+        for i in 0..=rhs_degree {
+            self_padding.push(T::zero());
+        }
+        let self_coeffs: Vec<&T> = self.core.iter().
+            chain(self_padding.iter()).collect();
 
         //front padding of zeros, then coefficients for rhs in decreasing order 
-        let rhs_iter = [T::zero(); self_degree].into_iter()
-            .chain(rhs.core.iter().rev());
+        let mut rhs_padding: Vec<T> = Vec::new();
+        for i in 0..=self_degree {
+            rhs_padding.push(T::zero());
+        }
+        let rhs_coeffs: Vec<&T> = rhs_padding.iter()
+            .chain(rhs.core.iter().rev()).collect();
 
         let product = (0..=product_degree).into_iter()
-            .map(|k| (k, &self_iter, &rhs_iter))
-            .map(|(k, &s, &r)| s.zip(r)
+            .map(|k| (k, self_coeffs.clone(), rhs_coeffs.clone()))
+            .map(|(k, s, r)| s.iter()
+                  .zip(r.iter())
                   .take(k)
-                  .map(|(a, b)| a * b)
-                  .sum()
+                  .map(|(a, b)| (**a).clone() * (**b).clone())
+                  .fold(T::zero(), |acc, prod| acc + prod)
                   )
             .collect::<Vec<T>>();
 
@@ -392,5 +441,38 @@ mod test {
                 IntegerModN::new(2, 4)
             ])
         );
+    }
+
+    #[test]
+    fn polynomial_multiplication() {
+        
+        // over Z/4Z
+        // 1 + 3x + 2x^3
+        let mod1 = Polynomial::<IntegerModN>::from_vec(vec![
+            IntegerModN::new(1, 4),
+            IntegerModN::new(3, 4),
+            IntegerModN::new(0, 4),
+            IntegerModN::new(2, 4),
+        ]);
+        // x + 3
+        let mod2 = Polynomial::<IntegerModN>::from_vec(vec![
+            IntegerModN::new(3, 4),
+            IntegerModN::new(1, 4),
+        ]);
+
+        let mod_prod = mod1 * mod2;
+        let mod_expected = Polynmomial::<IntegerModN>::from_vec(vec![
+                                                                IntegerModN::new(3, 4),
+                                                                IntegerModN::new(1, 4),
+                                                                IntegerModN::new(0, 4),
+                                                                IntegerModN::new(2, 4),
+                                                                IntegerModN::new(2, 4),
+        ]);
+
+        // (1 + 3x + 2x^3)(x + 3) = x + 3 + 3x^2 + 9x^2 + 2x^4 + 6x^3
+        //                        = 2x^4 + 2x^3 + x + 3
+        assert_eq!(mod_prod, mod_expected);
+
+
     }
 }

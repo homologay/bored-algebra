@@ -1,5 +1,9 @@
 #![allow(unused_macros)]
 
+use core::ops::{Add, Sub, Neg, Mul};
+use crate::traits::{One, Zero, IntegerModN};
+
+
 //idea: a macro like finite_group!((a, b),
 //                                  (abab, aB))
 //
@@ -25,6 +29,112 @@ macro_rules! finite_group {
 //     //todo
 // }
 
+///easy way to impl Zero
+macro_rules! zero_impl {
+    ($t:ty, $v:expr) => {
+        impl Zero for $t {
+            #[inline]
+            fn zero() -> $t {
+                $v
+            }
+            #[inline]
+            fn is_zero(&self) -> bool {
+                *self == $v
+            }
+        }
+    };
+}
+
+zero_impl!(usize, 0);
+zero_impl!(u8, 0);
+zero_impl!(u16, 0);
+zero_impl!(u32, 0);
+zero_impl!(u64, 0);
+zero_impl!(u128, 0);
+
+zero_impl!(isize, 0);
+zero_impl!(i8, 0);
+zero_impl!(i16, 0);
+zero_impl!(i32, 0);
+zero_impl!(i64, 0);
+zero_impl!(i128, 0);
+
+zero_impl!(f32, 0.0);
+zero_impl!(f64, 0.0);
+
+macro_rules! one_impl {
+    ($t:ty, $v:expr) => {
+        impl One for $t {
+            #[inline]
+            fn one() -> $t {
+                $v
+            }
+            #[inline]
+            fn is_one(&self) -> bool {
+                *self == $v
+            }
+        }
+    };
+}
+
+one_impl!(usize, 1);
+one_impl!(u8, 1);
+one_impl!(u16, 1);
+one_impl!(u32, 1);
+one_impl!(u64, 1);
+one_impl!(u128, 1);
+
+one_impl!(isize, 1);
+one_impl!(i8, 1);
+one_impl!(i16, 1);
+one_impl!(i32, 1);
+one_impl!(i64, 1);
+one_impl!(i128, 1);
+
+one_impl!(f32, 1.0);
+one_impl!(f64, 1.0);
+
+macro_rules! integers_mod {
+    ($name:ident, $num:expr) => {
+        //assert that $num is type u64?
+
+        #[derive(Eq, PartialEq, Hash, Clone, Copy, Debug)]
+        pub struct $name {
+            val: u64,
+        }
+
+        impl $name {
+            #[inline]
+            pub fn new(val: u64) -> Self {
+                Self { val: val % $num }
+            }
+        }
+
+        impl Add for $name {
+            type Output = Self;
+
+            #[inline]
+            fn add(self, rhs: Self) -> Self {
+                Self::new(self.val + rhs.val)
+            }
+        }
+    };
+}
+        
+/*
+macro_rules! integer_mod {
+    ($v:expr, $n:expr) => {
+        
+        #[derive(Eq, PartialEq, Hash, Clone, Copy, Debug)] 
+        struct IntegerMod$n {
+            val: $v,
+            n: $n,
+        }
+*/
+
+
+
+
 //some available designators:
 //
 //  -block
@@ -38,3 +148,21 @@ macro_rules! finite_group {
 //  -tt         token tree
 //  -ty         type
 //  -vis        visibility qualifier
+//
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn integers_mod() {
+        integers_mod!(IntegerMod4, 4);
+
+        let three = IntegerMod4::new(3);
+        let one = IntegerMod4::new(1);
+
+        let sum = one + three;
+
+        assert_eq!(sum, IntegerMod4::new(0));
+    }
+}

@@ -50,6 +50,7 @@ impl Add for IntegerModN {
     }
 }
 
+
 impl Neg for IntegerModN {
     type Output = Self;
 

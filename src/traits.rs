@@ -4,6 +4,13 @@ use core::ops::{Add, Mul, Neg, Sub};
 use std::collections::HashSet;
 use std::hash::Hash;
 
+///the property of a type having a zero element
+pub trait Zero { 
+
+    //not sure how to do this elegantly...
+    fn zero() -> Self;
+}
+
 pub trait Group {
     type Element: Eq + Hash + Add + Neg + Sub;
 

@@ -7,7 +7,7 @@ use itertools::EitherOrBoth::{Both, Left, Right};
 use itertools::Itertools;
 
 use crate::helpers::{is_prime, max, min};
-use crate::traits::{Field, Group, Ring};
+use crate::traits::{Zero, Field, Group, Ring};
 
 ///wrapper around u64 for primes
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
@@ -34,6 +34,10 @@ impl IntegerModN {
         Self { val: val % n, n: n }
     }
 }
+
+//to implement Zero ... change to enum struct or zero? then have cases for operators .. ugh
+//or change trait, but idk how to do that to make it work with the struct as is...
+//Some() optional field???
 
 impl Add for IntegerModN {
     type Output = Self;
@@ -218,12 +222,33 @@ impl<T: Add<Output = T> + Neg<Output = T> + Sub + Mul> Sub for Polynomial<T> {
     }
 }
 
-impl<T: Add + Neg + Sub + Mul> Mul for Polynomial<T> {
+impl<T: Add<Output = T> + Neg + Sub + Mul<Output = T> + Zero> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        todo!();
-    }
+        let self_degree = self.core.len() - 1;
+        let rhs_degree = rhs.core.len() - 1;
+        let product_degree = self_degree + rhs_degree;
+
+        //coefficients for self in increasing deg order, padded with zeros till product_degree
+        let self_iter = self.core.iter().
+            chain([T::zero(); rhs_degree].into_iter());
+
+        //front padding of zeros, then coefficients for rhs in decreasing order 
+        let rhs_iter = [T::zero(); self_degree].into_iter()
+            .chain(rhs.core.iter().rev());
+
+        let product = (0..=product_degree).into_iter()
+            .map(|k| (k, &self_iter, &rhs_iter))
+            .map(|(k, &s, &r)| s.zip(r)
+                  .take(k)
+                  .map(|(a, b)| a * b)
+                  .sum()
+                  )
+            .collect::<Vec<T>>();
+
+        Self::from_vec(product)
+       }
 }
 
 ///a polynomial ring with coefficients in a ring T

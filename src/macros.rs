@@ -1,8 +1,9 @@
 #![allow(unused_macros)]
 
-use core::ops::{Add, Sub, Neg, Mul};
-use crate::traits::{One, Zero, IntegerModN};
-
+use crate::traits::{IntegerModN, One, RingType, Zero};
+use core::ops::{Add, Mul, Neg, Sub};
+use std::fmt;
+use std::fmt::Display;
 
 //idea: a macro like finite_group!((a, b),
 //                                  (abab, aB))
@@ -94,9 +95,10 @@ one_impl!(i128, 1);
 one_impl!(f32, 1.0);
 one_impl!(f64, 1.0);
 
+#[macro_export]
 macro_rules! integers_mod {
-    ($name:ident, $num:expr) => {
-        //assert that $num is type u64?
+    ($name:ident, $char:expr) => {
+        //assert that $char is type u64?
 
         #[derive(Eq, PartialEq, Hash, Clone, Copy, Debug)]
         pub struct $name {
@@ -106,7 +108,7 @@ macro_rules! integers_mod {
         impl $name {
             #[inline]
             pub fn new(val: u64) -> Self {
-                Self { val: val % $num }
+                Self { val: val % $char }
             }
         }
 
@@ -118,22 +120,70 @@ macro_rules! integers_mod {
                 Self::new(self.val + rhs.val)
             }
         }
+
+        impl Neg for $name {
+            type Output = Self;
+
+            #[inline]
+            fn neg(self) -> Self {
+                Self::new($char - self.val)
+            }
+        }
+
+        impl Sub for $name {
+            type Output = Self;
+
+            #[inline]
+            fn sub(self, rhs: Self) -> Self {
+                self + (-rhs)
+            }
+        }
+
+        impl Mul for $name {
+            type Output = Self;
+
+            #[inline]
+            fn mul(self, rhs: Self) -> Self {
+                Self::new(self.val * rhs.val)
+            }
+        }
+
+        impl Zero for $name {
+            #[inline]
+            fn zero() -> Self {
+                Self::new(0)
+            }
+
+            #[inline]
+            fn is_zero(&self) -> bool {
+                *self == Self::zero()
+            }
+        }
+
+        impl One for $name {
+            #[inline]
+            fn one() -> Self {
+                Self::new(1)
+            }
+
+            #[inline]
+            fn is_one(&self) -> bool {
+                *self == Self::one()
+            }
+        }
+
+        impl Display for $name {
+            #[inline]
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f, "{}", self.val)
+            }
+        }
+
+        impl RingType for $name {}
+
+        impl IntegerModN for $name {}
     };
 }
-        
-/*
-macro_rules! integer_mod {
-    ($v:expr, $n:expr) => {
-        
-        #[derive(Eq, PartialEq, Hash, Clone, Copy, Debug)] 
-        struct IntegerMod$n {
-            val: $v,
-            n: $n,
-        }
-*/
-
-
-
 
 //some available designators:
 //
@@ -160,9 +210,18 @@ mod test {
 
         let three = IntegerMod4::new(3);
         let one = IntegerMod4::new(1);
+        let zero = IntegerMod4::zero();
 
         let sum = one + three;
+        let difference = one - three;
+        let product_1 = one * three;
+        let product_2 = three * three;
 
-        assert_eq!(sum, IntegerMod4::new(0));
+        assert_eq!(one, IntegerMod4::one());
+        assert_eq!(zero, IntegerMod4::new(0));
+        assert_eq!(sum, zero);
+        assert_eq!(difference, IntegerMod4::new(2));
+        assert_eq!(product_1, three);
+        assert_eq!(product_2, one);
     }
 }

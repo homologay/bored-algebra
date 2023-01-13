@@ -1,6 +1,7 @@
+#[macro_use]
+pub mod macros;
 pub mod finite_fields;
 pub mod helpers;
-pub mod macros;
 pub mod permutations;
 pub mod prime_generation;
 pub mod traits;

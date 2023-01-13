@@ -1,7 +1,6 @@
 //! here lie traits for algebraic abstractions...
 
-
-use core::fmt::{Display, Debug};
+use core::fmt::{Debug, Display};
 use core::ops::{Add, Mul, Neg, Sub};
 use std::collections::HashSet;
 use std::hash::Hash;
@@ -19,22 +18,37 @@ pub trait Zero: Sized + Add<Self, Output = Self> {
 
 ///property of having a 1
 pub trait One: Sized + Mul<Self, Output = Self> {
-   fn one() -> Self;
+    fn one() -> Self;
 
     fn set_one(&mut self) {
         *self = One::one();
     }
 
-    #[inline]
-    fn is_one(&self) -> bool
-    where
-        Self: PartialEq,
-    {
-        *self == Self::one()
-    }
+    fn is_one(&self) -> bool;
 }
 
-pub trait IntegerModN: Eq + Hash + Add + Neg + Sub + Mul + Clone + Copy + Display + Debug {}
+///encompasses all the structs made by integers_mod!, such as IntegersMod5
+pub trait IntegerModN: RingType + Copy + Display + Debug {}
+
+///all the things for a ring
+pub trait RingType:
+    Eq
+    + Add<Output = Self>
+    + Neg<Output = Self>
+    + Sub<Output = Self>
+    + Mul<Output = Self>
+    + Zero
+    + One
+    + Clone
+{
+}
+
+impl RingType for isize {}
+impl RingType for i8 {}
+impl RingType for i16 {}
+impl RingType for i32 {}
+impl RingType for i64 {}
+impl RingType for i128 {}
 
 pub trait Group {
     type Element: Eq + Hash + Add + Neg + Sub;

@@ -50,6 +50,17 @@ impl RingType for i32 {}
 impl RingType for i64 {}
 impl RingType for i128 {}
 
+///for an element of an integral domain
+pub trait Integral: RingType {}
+
+///for an element of a division ring
+pub trait MulInverse: RingType {
+    fn mul_inverse(self) -> Self;
+}
+
+///for an element of a (finite, since we're not doing any others) field
+pub trait FieldType: RingType + Integral + MulInverse {}
+
 pub trait Group {
     type Element: Eq + Hash + Add + Neg + Sub;
 

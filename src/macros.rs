@@ -185,6 +185,74 @@ macro_rules! integers_mod {
     };
 }
 
+///usage: finite_field!(GF17pow3, 17, 3) for F_{17^3}
+#[macro_export]
+macro_rules! finite_field {
+    ($name:ident, $char:expr, $pow:expr) => {
+        
+        #[derive(Eq, PartialEq, Hash, Clone, Debug)]
+        pub struct $name {
+            todo!();
+        }
+
+        impl $name {
+            #[inline]
+            pub fn new() -> Self {
+                todo!();
+            }
+        }
+
+        impl Add for $name {
+            type Output = Self;
+
+            #[inline]
+            fn add(self, Rhs: Self) -> Self {
+                todo!();
+            }
+        }
+
+        impl Neg for $name {
+            type Output = Self;
+
+            #[inline]
+            fn neg(self) -> Self {
+                todo!();
+            }
+        }
+
+        impl Sub for $name {
+            type Output = Self;
+
+            #[inline]
+            fn sub(self, Rhs: Self) -> Self {
+                todo!();
+            }
+        }
+
+        impl MulInverse for $name {
+            type Output = Self;
+
+            #[inline]
+            pub fn mul_inverse(self) -> Self {
+                todo!();
+            }
+        }
+
+        impl One for $name {
+            todo!();
+        }
+
+        impl Zero for $name {
+            todo!();
+        }
+
+        impl RingType for $name {}
+
+        impl Integral for $name {}
+
+        impl FieldType for $name {}
+}
+
 //some available designators:
 //
 //  -block

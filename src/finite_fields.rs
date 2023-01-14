@@ -3,7 +3,7 @@
 use std::collections::HashSet;
 use std::fmt;
 use std::fmt::Display;
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Mul, Neg, Sub, Div};
 
 use itertools::EitherOrBoth::{Both, Left, Right};
 use itertools::Itertools;
@@ -104,6 +104,14 @@ impl<T: RingType> Mul for Polynomial<T> {
             result.push(kth_coeff);
         }
         Self::from_vec(result)
+    }
+}
+
+impl<T: RingType + Div> Div for Polynomial<T> {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self {
+        todo!();
     }
 }
 

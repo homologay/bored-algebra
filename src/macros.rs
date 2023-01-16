@@ -251,6 +251,7 @@ macro_rules! finite_field {
         impl Integral for $name {}
 
         impl FieldType for $name {}
+};
 }
 
 //some available designators:

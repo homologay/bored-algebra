@@ -25,17 +25,47 @@ impl Prime {
     }
 }
 
-///a polynomial with coefficients in a ring T
+///A polynomial with coefficients in a ring T. 
 #[derive(Eq, PartialEq, Debug, Clone)]
 struct Polynomial<T: RingType> {
-    core: Vec<T>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
+    core: Box<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
 }
 
 impl<T: RingType> Polynomial<T> {
     fn from_vec(vec: Vec<T>) -> Self {
-        Self { core: vec }
+        Self { core: Box::new(vec) }
     }
 }
+
+impl<T: RingType> One for Polynomial<T> {
+    fn one() -> Self {
+        Self::from_vec(vec![T::one()])
+    }
+
+    fn is_one(&self) -> bool {
+        if *self == Self::one() {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+impl<T: RingType> Zero for Polynomial<T> {
+    fn zero() -> Self {
+        Self::from_vec(vec![T::zero()])
+    }
+
+    fn is_zero(&self) -> bool {
+        if *self == Self::zero() {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+impl<T: RingType> RingType for Polynomial<T> {}
 
 impl<T: RingType> Add for Polynomial<T> {
     type Output = Self;
@@ -207,4 +237,41 @@ mod test {
         assert_eq!(mod_prod, mod_expected);
         //got:
     }
+
+    #[test]
+    fn multivariable_polynomial_arithmetic() {
+
+        // in Z[x,y]
+
+        let one = Polynomial::<Polynomial::<i64>>::from_vec(vec![
+            Polynomial::<i64>::from_vec(vec![1])]);
+        let zero = Polynomial::<Polynomial::<i64>>::from_vec(vec![
+        Polynomial::<i64>::from_vec(vec![0])]);
+
+        // R(x,y) = -1 + xy
+        // L(x,y) =  1 - xy 
+        
+        let r = Polynomial::<Polynomial::<i64>>::from_vec(vec![
+                  Polynomial::<i64>::from_vec(vec![-1]),  //ones
+                    Polynomial::<i64>::from_vec(vec![0, 1]),     //x's
+                ]);
+
+        let l = Polynomial::<Polynomial::<i64>>::from_vec(vec![
+                  Polynomial::<i64>::from_vec(vec![1]),  //ones
+                    Polynomial::<i64>::from_vec(vec![0, -1]),     //x's
+                ]);
+
+        assert_eq!(r + l, zero);
+
+        // P(x,y) = xy + 3x^2 - 4y^2x - 8
+        let p = Polynomial::<Polynomial::<i64>>::from_vec(vec![
+                Polynomial::<i64>::from_vec(vec![-8]),
+        ]);
+
+        // Q(x,y) = x^3 - 4y + 1
+        
+        //indexing confusion ....................................
+    }
+
+
 }

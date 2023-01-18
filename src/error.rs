@@ -1,5 +1,5 @@
-use thiserror::Error;
 use anyhow;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ArithmeticError {
@@ -8,10 +8,7 @@ pub enum ArithmeticError {
     #[error("number not in valid range")]
     OutOfBounds,
     #[error("algorithm {alg:?} is not defined for element {el:?}")]
-    AlgNotApplicable {
-        alg: String,
-        el: u64,
-    },
+    AlgNotApplicable { alg: String, el: u64 },
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

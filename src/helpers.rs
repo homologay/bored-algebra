@@ -71,7 +71,6 @@ pub fn euclid_alg(mut a: u64, mut b: u64) -> u64 {
     a
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

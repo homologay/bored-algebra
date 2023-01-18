@@ -3,7 +3,7 @@
 use std::collections::HashSet;
 use std::fmt;
 use std::fmt::Display;
-use std::ops::{Add, Mul, Neg, Sub, Div};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 use itertools::EitherOrBoth::{Both, Left, Right};
 use itertools::Itertools;

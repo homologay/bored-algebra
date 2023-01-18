@@ -1,5 +1,6 @@
 #[macro_use]
 pub mod macros;
+pub mod error;
 pub mod finite_fields;
 pub mod helpers;
 pub mod permutations;

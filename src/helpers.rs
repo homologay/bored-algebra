@@ -51,12 +51,26 @@ pub fn min(a: u64, b: u64) -> u64 {
     }
 }
 
-///the greatest common divisor of two positive integers.
+/// the greatest common divisor of two positive integers.
 pub fn gcd(a: u64, b: u64) -> u64 {
-    (1..=min(a, b))
-        .map(|n| ((a % n == 0) && (b % n == 0), n))
-        .fold(1, |acc, (divides, n)| if divides { n } else { acc })
+    let mut a_mut = a;
+    let mut b_mut = b;
+    euclid_alg(a_mut, b_mut)
 }
+
+/// euclidean algorithm
+pub fn euclid_alg(mut a: u64, mut b: u64) -> u64 {
+    if (b == 1) || (b == 0) || (a == 1) || (a == 0) {
+        return 1;
+    }
+    while b != 0 {
+        let mut t = b;
+        b = a % b;
+        a = t;
+    }
+    a
+}
+
 
 #[cfg(test)]
 mod tests {

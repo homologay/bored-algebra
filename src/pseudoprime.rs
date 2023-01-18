@@ -3,10 +3,15 @@
 use std::collections::HashMap;
 use rand::{thread_rng, Rng};
 
+use crate::error::ArithmeticError;
+
 /// Miller-Rabin primality test. Requires n > 4. true = pseudoprime, false = composite
-pub fn miller_rabin(n: u64) -> bool {
+pub fn miller_rabin(n: u64) -> Result<bool, ArithmeticError::AlgNotApplicable> {
     if n < 5 {
-        panic!();
+        return Err(ArithmeticError::AlgNotApplicable {
+           alg: Miller-Rabin,
+            el: n,
+        });
     }
     let pow_2 = split_off_power_of_two(n);
     let a = random_base(n);                 //pick 1 < a < n
@@ -20,7 +25,7 @@ pub fn miller_rabin(n: u64) -> bool {
     //
     //      for each r with 1 <= r < k if b^{2^r} = -1 mod n output true
     //
-    false
+    Ok(false)
 }
 
 /// computes unique integers m, k such that m is odd and n - 1 = 2^k m. key = k, val = m.

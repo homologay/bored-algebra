@@ -189,7 +189,7 @@ macro_rules! integers_mod {
 #[macro_export]
 macro_rules! finite_field {
     ($name:ident, $char:expr, $pow:expr) => {
-        
+
         #[derive(Eq, PartialEq, Hash, Clone, Debug)]
         pub struct $name {
             todo!();

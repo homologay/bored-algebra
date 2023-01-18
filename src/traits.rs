@@ -6,7 +6,7 @@ use std::collections::HashSet;
 use std::hash::Hash;
 
 ///property of having a 0
-pub trait Zero: Sized + Add< Output = Self> {
+pub trait Zero: Sized + Add<Output = Self> {
     fn zero() -> Self;
 
     fn set_zero(&mut self) {

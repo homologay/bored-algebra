@@ -10,7 +10,7 @@ use itertools::Itertools;
 
 use crate::helpers::{is_prime, max, min};
 use crate::integers_mod;
-use crate::traits::{Field, Group, IntegerModN, One, Ring, RingType, Zero};
+use crate::traits::{IntegerModN, One, RingType, Zero};
 
 ///wrapper around u64 for primes
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]

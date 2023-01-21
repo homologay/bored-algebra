@@ -39,6 +39,5 @@ pub mod macros;
 pub mod error;
 pub mod finite_fields;
 pub mod helpers;
-pub mod permutations;
 pub mod prime_generation;
 pub mod traits;

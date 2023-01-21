@@ -1,21 +1,11 @@
 //! helper functions
 
+use crate::traits::RingType;
+use core::ops::Rem;
+
 ///non-optimized euler phi/totient function
-pub fn euler_phi_preop(n: u64) -> u64 {
-    if (n == 1) || (n == 0) {
-        return 1;
-    } else {
-        return (1..n).map(|k| (gcd(k, n), k)).fold(
-            0,
-            |acc, (gcd, k)| {
-                if gcd == 1 {
-                    acc + 1
-                } else {
-                    acc
-                }
-            },
-        );
-    }
+pub fn euler_phi_preop(n: i128) -> i128 {
+    todo!();   
 }
 
 ///returns true if n is prime, false otherwise.
@@ -51,24 +41,22 @@ pub fn min(a: u64, b: u64) -> u64 {
     }
 }
 
-/// the greatest common divisor of two positive integers.
-pub fn gcd(a: u64, b: u64) -> u64 {
-    let mut a_mut = a;
-    let mut b_mut = b;
-    euclid_alg(a_mut, b_mut)
-}
+/// euclidean algorithm: returns gcd of two elements of a ring.
+pub fn euclid_alg<'a, T: RingType + Rem<Output = T> + 'a>(first: &'a T, second: &'a T) -> T 
+where &'a T: Rem<Output = T> {
+    println!("starting euclid_alg with parameters:");
+    let mut a = first;
+    let mut b = second;
 
-/// euclidean algorithm
-pub fn euclid_alg(mut a: u64, mut b: u64) -> u64 {
-    if (b == 1) || (b == 0) || (a == 1) || (a == 0) {
-        return 1;
+    if (b == &T::one()) || (b == &T::zero()) || (a == &T::one()) || (a == &T::zero()) {
+        return T::one();
     }
-    while b != 0 {
+    while *b != T::zero() {
         let mut t = b;
-        b = a % b;
+        let b = &(a % b); 
         a = t;
-    }
-    a
+   }
+   a.clone()
 }
 
 #[cfg(test)]
@@ -76,12 +64,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_gcd() {
-        assert_eq!(gcd(0, 3), 1);
-        assert_eq!(gcd(3, 12), 3);
-        assert_eq!(gcd(12, 15), 3);
-        assert_eq!(gcd(20, 3), 1);
-        assert_eq!(gcd(18, 36), 18);
+    fn test_euclid_alg() {
+        assert_eq!(euclid_alg(&0, &3), 1);
+        assert_eq!(euclid_alg(&3, &12), 3);
+        assert_eq!(euclid_alg(&12, &15), 3);
+        assert_eq!(euclid_alg(&20, &3), 1);
+        assert_eq!(euclid_alg(&18, &36), 18);
     }
 
     #[test]

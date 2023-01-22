@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::fmt;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::rc::Rc;
 
 use itertools::EitherOrBoth::{Both, Left, Right};
 use itertools::Itertools;
@@ -25,19 +26,62 @@ impl Prime {
     }
 }
 
-///A polynomial with coefficients in a ring T.
-#[derive(Eq, PartialEq, Debug, Clone)]
+///A polynomial with coefficients in a ring T. Stored as Box<Vec<T>>, where the index of the vector
+///is the degree of the coefficient (the coefficient is the value at that index).
+#[derive(Debug, Clone)]
 struct Polynomial<T: RingType> {
-    core: Box<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
+    coeffs: Rc<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
+    deg: u64,
 }
 
+//is the "from_" naming convention followed properly here?
 impl<T: RingType> Polynomial<T> {
     fn from_vec(vec: Vec<T>) -> Self {
+        
+        // the degree is the maximum of the indices of nonzero coefficients
+        let degree = match vec.iter().rposition(|coeff| *coeff != T::zero()) {
+            Some(index) => index as u64,
+            None => 0 as u64 ,
+        };
+
         Self {
-            core: Box::new(vec),
+            coeffs: Rc::new(vec),
+            deg: degree,
         }
     }
+
+    fn degree(&self) -> u64 {
+        todo!(); 
+    }
+
+    fn coeffs(&self) -> Rc<Vec<T>> {
+        todo!();
+    }
 }
+
+impl<T: RingType> PartialEq for Polynomial<T> {
+    fn eq(&self, other: &Self) -> bool {
+        let lhs_deg = self.degree();
+        let rhs_deg = other.degree();
+
+        if lhs_deg == rhs_deg {
+            //iterate over (elem, index) of each, up to lhs_deg + 1,check all nonzero ones are equal
+            return self.coeffs().iter().enumerate().take((lhs_deg + 1).try_into().unwrap()).eq(other
+                .coeffs
+                .iter()
+                .enumerate()
+                .take((lhs_deg + 1).try_into().unwrap()));
+        } else {
+            return false; 
+        }
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
+    }
+}
+
+impl<T: RingType> Eq for Polynomial<T> {}
 
 impl<T: RingType> One for Polynomial<T> {
     fn one() -> Self {
@@ -73,16 +117,16 @@ impl<T: RingType> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        let sum = self
-            .core
-            .into_iter()
-            .zip_longest(rhs.core.into_iter())
+        let sum = (*self
+            .coeffs())       //*Rc<Vec<T>>
+            .iter()         
+            .zip_longest((*rhs.coeffs()).iter())
             .map(|elem| match elem {
-                Both(a, b) => a + b,
-                Left(b) => b,
-                Right(a) => a,
+                Both(&a, &b) => a + b,
+                Left(&b) => b,
+                Right(&a) => a,
             })
-            .collect::<Vec<T>>();
+            .collect();
 
         Self::from_vec(sum)
     }
@@ -92,9 +136,9 @@ impl<T: RingType> Neg for Polynomial<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
-        let neg_core = self.core.into_iter().map(|elem| -elem).collect::<Vec<T>>();
+        let neg_coeffs = self.coeffs().into_iter().map(|elem| -elem).collect::<Vec<T>>();
 
-        Self::from_vec(neg_core)
+        Self::from_vec(neg_coeffs)
     }
 }
 
@@ -110,12 +154,12 @@ impl<T: RingType> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        //degrees of the polynomials
-        let n = self.core.len() - 1;
-        let m = rhs.core.len() - 1;
-
-        let lhs_vec = self.core;
-        let rhs_vec = rhs.core;
+        
+        //degrees of the polynomials lhs = n, rhs = m
+        let lhs_vec = self.coeffs();
+        let rhs_vec = rhs.coeffs();
+        let n = &lhs_vec.len() - 1;
+        let m = &rhs_vec.len() - 1;
 
         // the formula:
         //\sum_{k=0}^n a_k x^k \sum_{k=0}^m b_k x^k = \sum_{k=0}^{n+m} \sum_{i=0}^k a_i b_{k-i} x^k

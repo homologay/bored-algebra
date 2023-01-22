@@ -5,7 +5,7 @@ use core::ops::Rem;
 
 ///non-optimized euler phi/totient function
 pub fn euler_phi_preop(n: i128) -> i128 {
-    todo!();   
+    todo!();
 }
 
 ///returns true if n is prime, false otherwise.
@@ -42,8 +42,10 @@ pub fn min(a: u64, b: u64) -> u64 {
 }
 
 /// euclidean algorithm: returns gcd of two elements of a ring.
-pub fn euclid_alg<'a, T: RingType + Rem<Output = T> + 'a>(first: &'a T, second: &'a T) -> T 
-where &'a T: Rem<Output = T> {
+pub fn euclid_alg<'a, T: RingType + Rem<Output = T> + 'a>(first: &'a T, second: &'a T) -> T
+where
+    &'a T: Rem<Output = T>,
+{
     println!("starting euclid_alg with parameters:");
     let mut a = first;
     let mut b = second;
@@ -53,10 +55,10 @@ where &'a T: Rem<Output = T> {
     }
     while *b != T::zero() {
         let mut t = b;
-        let b = &(a % b); 
+        let b = &(a % b);
         a = t;
-   }
-   a.clone()
+    }
+    a.clone()
 }
 
 #[cfg(test)]

@@ -5,9 +5,12 @@ pub struct PrimeGenerator {
     next: u64,
 }
 
-impl PrimeGenerator {
-    pub fn new() -> Self {
-        Self { curr: 2, next: 3 }
+impl Default for PrimeGenerator {
+    fn default() -> Self {
+        Self { 
+            curr: 2, 
+            next: 3,
+        }
     }
 }
 

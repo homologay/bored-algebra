@@ -11,7 +11,7 @@ pub fn euler_phi_preop(n: i128) -> i128 {
 ///returns true if n is prime, false otherwise.
 pub fn is_prime(n: u64) -> bool {
     if (n == 1) || (n == 0) {
-        return false;
+        false
     } else {
         for k in 2..n {
             if (n % k) == 0 {
@@ -19,71 +19,44 @@ pub fn is_prime(n: u64) -> bool {
             }
         }
 
-        return true;
+        true
     }
 }
 
 ///computes maximum. Returns a if a == b.
 pub fn max<T: Ord>(a: T, b: T) -> T {
     if a >= b {
-        return a;
+        a
     } else {
-        return b;
+        b
     }
 }
 
 ///computes min of two numbers. Returns a if a == b.
 pub fn min<T: Ord>(a: T, b: T) -> T {
     if a <= b {
-        return a;
+        a
     } else {
-        return b;
+        b
     }
-}
-
-/// euclidean algorithm: returns gcd of two elements of a ring.
-pub fn euclid_alg<'a, T: RingType + Rem<Output = T> + 'a>(first: &'a T, second: &'a T) -> T
-where
-    &'a T: Rem<Output = T>,
-{
-    println!("starting euclid_alg with parameters:");
-    let mut a = first;
-    let mut b = second;
-
-    if (b == &T::one()) || (b == &T::zero()) || (a == &T::one()) || (a == &T::zero()) {
-        return T::one();
-    }
-    while *b != T::zero() {
-        let mut t = b;
-        let b = &(a % b);
-        a = t;
-    }
-    a.clone()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    // runs indefinitely. Why? who knows.
-    /*
-    #[test]
-    fn test_euclid_alg() {
-        assert_eq!(euclid_alg(&0, &3), 1);
-        assert_eq!(euclid_alg(&3, &12), 3);
-        assert_eq!(euclid_alg(&12, &15), 3);
-        assert_eq!(euclid_alg(&20, &3), 1);
-        assert_eq!(euclid_alg(&18, &36), 18);
-    }*/
-
     #[test]
     fn test_max() {
-        todo!();
+        assert_eq!(max(0, 1), 1);
+        assert_eq!(max(4, 4), 4);
+        assert_eq!(max(-4234, -232442), -4234);
     }
 
     #[test]
     fn test_min() {
-        todo!();
+        assert_eq!(min(0, 1), 0);
+        assert_eq!(min(4, 4), 4);
+        assert_eq!(min(-4234, -232442), -232442);
     }
 
     #[test]

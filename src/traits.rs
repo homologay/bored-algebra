@@ -5,7 +5,7 @@ use core::ops::{Add, Mul, Neg, Sub};
 use std::collections::HashSet;
 use std::hash::Hash;
 
-pub use num_traits::identities::{zero, one, Zero, One};
+pub use num_traits::identities::{one, zero, One, Zero};
 
 /*
 ///property of having a 0

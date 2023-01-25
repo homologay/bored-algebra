@@ -1,4 +1,4 @@
-//! Project root 
+//! Project root
 
 #[macro_use]
 pub mod macros;

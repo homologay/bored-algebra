@@ -25,9 +25,10 @@ git clone git@github.com:maxinebeckie/bored-algebra.git
 ```
 ## Features
 
-* Polynomial arithmetic over a ring (in progress - note this gives us multivariable polynomials for free!)
-* Integers mod n
-* Finite fields (ie, GF(p, q). q > 1 is in progress)
+* Polynomial arithmetic over a ring (in progress)
+* Integers mod n (works, but more methods are todo)
+* Quotient rings (todo)
+* Finite fields (ie, GF(p, q). q > 1 is todo)
 * Iterators over special polynomials: irreducible, cyclotomic, .. (todo)
 * Iterators over primes in a ring (todo)
 * Localization of a ring (todo)

@@ -1,22 +1,12 @@
 # Bored Algebra
 
-YAML (yet another math library)
-
-### What this is
-
-* incomplete, unpolished
-* a library
-* focused on generics and abstractions
-
-### What this isn't
-
-* on crates.io (yet)
-* focused on performance
-* replacing nalgebra
+Library for constructions on rings, with a focus on iterators and finite fields.
 
 ## How 2 Use
 
-Clone the repo:
+1. Don't, yet. This project is still in early stages.
+
+2. Clone the repo:
 ```sh
 git clone https://github.com/maxinebeckie/bored-algebra.git
 ```

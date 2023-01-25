@@ -10,7 +10,7 @@ YAML (yet another math library)
 
 ### What this isn't
 
-* an app
+* on crates.io (yet)
 * focused on performance
 * replacing nalgebra
 
@@ -20,14 +20,15 @@ Clone the repo:
 ```sh
 git clone https://github.com/maxinebeckie/bored-algebra.git
 ```
-Or, if you're into ssh:
 ```sh
 git clone git@github.com:maxinebeckie/bored-algebra.git
 ```
 ## Features
 
-* Polynomial arithmetic over a ring (mostly works, still smoothing some edges)
+* Polynomial arithmetic over a ring (in progress - note this gives us multivariable polynomials for free!)
 * Integers mod n
-* Finite fields (in progress)
-* Prime generation (works, but is super inefficient)
-* Irreducible polynomial generation (todo)
+* Finite fields (ie, GF(p, q). q > 1 is in progress)
+* Prime generation (works, veeerrrryyy slowly)
+* Iterators over special polynomials: irreducible, cyclotomic, .. (todo)
+* Localization of a ring (todo)
+* Ring of power series (todo)

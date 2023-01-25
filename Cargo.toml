@@ -6,8 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-itertools = "0.10.5"
-rand = "0.8.5"
-num-bigint = "0.4.3"
 thiserror = "1.0"
 anyhow = { version = "1.0.68", features = ["backtrace"] }
+num-traits = { version = "0.2.15", features = ["i128"] }

@@ -1,13 +1,10 @@
 //! Polynomials
 use crate::integers_mod;
-use crate::traits::{IntegerModN, One, RingType, Zero};
+use crate::traits::{IntegerModN, RingType};
 
 use std::fmt;
 use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Neg, Sub};
-
-use itertools::EitherOrBoth::{Both, Left, Right};
-use itertools::Itertools;
+use std::ops::{Add, Div, Mul, Neg, Sub, Rem};
 
 ///A polynomial with coefficients in a ring T, represented as Box<Vec<T>>. The coefficient for
 ///degree n is the element at index n in the vector. 
@@ -116,8 +113,8 @@ impl<T: RingType> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        let sum = (*self
-            .coeffs())       //*Rc<Vec<T>>
+        /* let sum = (*self
+            .coeffs())       // *Rc<Vec<T>>
             .iter()         
             .zip_longest((*rhs.coeffs()).iter())
             .map(|elem| match elem {
@@ -128,6 +125,8 @@ impl<T: RingType> Add for Polynomial<T> {
             .collect();
 
         Self::from_vec(sum)
+        */
+        todo!();
     }
 }
 

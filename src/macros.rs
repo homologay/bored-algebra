@@ -30,6 +30,7 @@ macro_rules! finite_group {
 //     //todo
 // }
 
+/*
 ///easy way to impl Zero
 macro_rules! zero_impl {
     ($t:ty, $v:expr) => {
@@ -94,6 +95,7 @@ one_impl!(i128, 1);
 
 one_impl!(f32, 1.0);
 one_impl!(f64, 1.0);
+*/
 
 #[macro_export]
 macro_rules! integers_mod {

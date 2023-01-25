@@ -5,6 +5,9 @@ use core::ops::{Add, Mul, Neg, Sub};
 use std::collections::HashSet;
 use std::hash::Hash;
 
+pub use num_traits::identities::{zero, one, Zero, One};
+
+/*
 ///property of having a 0
 pub trait Zero: Sized + Add<Output = Self> {
     fn zero() -> Self;
@@ -26,6 +29,7 @@ pub trait One: Sized + Mul<Self, Output = Self> {
 
     fn is_one(&self) -> bool;
 }
+*/
 
 ///encompasses all the structs made by integers_mod!, such as IntegersMod5
 pub trait IntegerModN: RingType + Copy + Display + Debug {}

@@ -1,3 +1,5 @@
+//! All the macros defined in the library
+
 #![allow(unused_macros)]
 
 use crate::traits::{IntegerModN, One, RingType, Zero};
@@ -97,6 +99,12 @@ one_impl!(f32, 1.0);
 one_impl!(f64, 1.0);
 */
 
+/// Generates a struct for the ring $\mathbb{Z}/n\mathbb{Z}$, for a given $n$. 
+/// ```
+/// // usage:
+/// integers_mod!(IntegerMod5, 5);
+/// ```
+/// The above generates a struct for $\mathbb{Z}/5\mathbb{Z}$. 
 #[macro_export]
 macro_rules! integers_mod {
     ($name:ident, $char:expr) => {
@@ -187,7 +195,12 @@ macro_rules! integers_mod {
     };
 }
 
-///usage: finite_field!(GF17pow3, 17, 3) for F_{17^3}
+/// Generates a struct for $GF(p, q)$, for a given prime $p$ and positive integer $q$. 
+/// ```
+/// // usage:
+/// finite_field!(GF5pow3, 5, 3);
+/// ```
+/// The above would generate $GF(5, 3)$, or alternately $\mathbb{F}\_{5^3}$. 
 #[macro_export]
 macro_rules! finite_field {
     ($name:ident, $char:expr, $pow:expr) => {

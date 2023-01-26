@@ -1,11 +1,16 @@
 [package]
-name = "bored-algebra"
+name = "bored_algebra"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Maxine Beckie <maxbeckie@tutanota.com>"]
+description = "A math library focused on constructions on rings"
+readme = "README.md"
+license = "MIT"
 
 [dependencies]
 thiserror = "1.0"
 anyhow = { version = "1.0.68", features = ["backtrace"] }
 num-traits = { version = "0.2.15", features = ["i128"] }
+
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "katex-header.html" ] 

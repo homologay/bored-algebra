@@ -1,3 +1,5 @@
+//! An iterator that generates prime numbers (slowly)
+
 use crate::helpers::is_prime;
 
 pub struct PrimeGenerator {

@@ -1,4 +1,4 @@
-//! here lie structs for finite fields
+//! Finite fields
 
 use std::fmt;
 use std::fmt::Display;

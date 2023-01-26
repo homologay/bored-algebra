@@ -5,33 +5,39 @@ use crate::traits::{IntegerModN, RingType};
 use std::fmt;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Sub, Rem};
+use std::rc::Rc;
 
-///A polynomial with coefficients in a ring T, represented as Box<Vec<T>>. The coefficient for
-///degree n is the element at index n in the vector. 
+use num_traits::identities::{Zero, One};
+
+/// A polynomial with coefficients in a ring `T`, represented as `Rc<Vec<T>>`. The coefficient for
+/// degree n is the element at index n in the vector. Multivariable polynomials can be constructed
+/// recursively by using polynomials as the coefficients. 
 #[derive(Debug, Clone)]
-struct Polynomial<T: RingType> {
-    coeffs: Box<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
+pub struct Polynomial<T: RingType> {
+    coeffs: Rc<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
     deg: u64,
 }
 
-//is the "from_" naming convention followed properly here?
 impl<T: RingType> Polynomial<T> {
-    fn degree(&self) -> u64 {
-        todo!(); 
+    pub fn degree(&self) -> u64 {
+        self.deg 
     }
 
-    fn coeffs(&self) -> Box<Vec<T>> {
-        todo!();
+    pub fn coeffs(&self) -> Rc<Vec<T>> {
+        self.coeffs.clone()
     }
 }
 
-/// From
+/// # Example: 
 /// ```
+/// use bored_algebra::polynomials::Polynomial;
+/// use std::rc::Rc;
+///
 /// let vec = vec![0, 1, 2];
 /// // x + 2x^2
-/// let p: Polynomial<usize> = Polynomial::from(vec.clone());
+/// let p: Polynomial<i64> = Polynomial::from(vec.clone());
 /// assert_eq!(p.degree(), 2_u64);
-/// assert_eq!(p.coeffs(), Box::new(vec));
+/// assert_eq!(p.coeffs(), Rc::new(vec));
 /// ```
 impl<T: RingType> From<Vec<T>> for Polynomial<T> {
     fn from(vec: Vec<T>) -> Self {
@@ -43,7 +49,7 @@ impl<T: RingType> From<Vec<T>> for Polynomial<T> {
         };
 
         Self {
-            coeffs: Box::new(vec),
+            coeffs: Rc::new(vec),
             deg: degree,
         }
     }
@@ -51,7 +57,7 @@ impl<T: RingType> From<Vec<T>> for Polynomial<T> {
 
 impl<T: RingType> Into<Vec<T>> for Polynomial<T> {
     fn into(self) -> Vec<T> {
-        *self.coeffs()
+        (*self.coeffs()).clone()
     }
 }
 
@@ -84,7 +90,7 @@ impl<T: RingType> Eq for Polynomial<T> {}
 /// The 1 of the polynomial ring is the 1 of its coeffient ring. 
 impl<T: RingType> One for Polynomial<T> {
     fn one() -> Self {
-        Self::from_vec(vec![T::one()])
+        Self::from(vec![T::one()])
     }
 
     fn is_one(&self) -> bool {
@@ -99,7 +105,7 @@ impl<T: RingType> One for Polynomial<T> {
 /// The 0 of the polynomial ring is the 0 of its coefficient ring. 
 impl<T: RingType> Zero for Polynomial<T> {
     fn zero() -> Self {
-        Self::from_vec(vec![T::zero()])
+        Self::from(vec![T::zero()])
     }
 
     fn is_zero(&self) -> bool {
@@ -113,6 +119,11 @@ impl<T: RingType> Zero for Polynomial<T> {
 
 impl<T: RingType> RingType for Polynomial<T> {}
 
+/// Polynomial addition. The notation in the code follows the formula
+/// $$
+/// \sum\_{i=0}^n a\_i x^i + \sum\_{j=0} b\_j x^j = \sum\_{i=0}^{\max(n,m)} (a_i + b_i) x^i
+/// $$
+/// where coefficients beyond the degree of the polynomial are taken to be zero. 
 impl<T: RingType> Add for Polynomial<T> {
     type Output = Self;
 
@@ -138,9 +149,13 @@ impl<T: RingType> Neg for Polynomial<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
+        
+        /*
         let neg_coeffs = self.coeffs().into_iter().map(|elem| -elem).collect::<Vec<T>>();
 
-        Self::from_vec(neg_coeffs)
+        Self::from(neg_coeffs)
+        */
+        todo!();
     }
 }
 
@@ -152,11 +167,17 @@ impl<T: RingType> Sub for Polynomial<T> {
     }
 }
 
+/// Polynomial multiplication. The notation in the code follows the formula
+/// $$
+/// \Big(\sum\_{i=0}^n a\_i x^i\Big)\Big(\sum\_{j=0}^m b\_j x^j\Big) = 
+/// \sum\_{k=0}^{n+m} \sum\_{i = 0}^k a\_i b\_{k-i} x^k
+/// $$
 impl<T: RingType> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        
+       
+        /*
         //degrees of the polynomials lhs = n, rhs = m
         let lhs_vec = self.coeffs();
         let rhs_vec = rhs.coeffs();
@@ -181,7 +202,9 @@ impl<T: RingType> Mul for Polynomial<T> {
             }
             result.push(kth_coeff);
         }
-        Self::from_vec(result)
+        Self::from(result)
+        */
+        todo!();
     }
 }
 

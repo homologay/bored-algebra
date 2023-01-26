@@ -1,4 +1,4 @@
-//! here lie traits for algebraic abstractions...
+//! Traits for rings 
 
 use core::fmt::{Debug, Display};
 use core::ops::{Add, Mul, Neg, Sub};

@@ -1,3 +1,5 @@
+//! Errors for the library
+
 use anyhow;
 use thiserror::Error;
 

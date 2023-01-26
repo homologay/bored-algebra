@@ -12,22 +12,6 @@ use num_traits::identities::{Zero, One};
 /// A polynomial with coefficients in a ring `T`, represented as `Rc<Vec<T>>`. The coefficient for
 /// degree n is the element at index n in the vector. Multivariable polynomials can be constructed
 /// recursively by using polynomials as the coefficients. 
-#[derive(Debug, Clone)]
-pub struct Polynomial<T: RingType> {
-    coeffs: Rc<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
-    deg: u64,
-}
-
-impl<T: RingType> Polynomial<T> {
-    pub fn degree(&self) -> u64 {
-        self.deg 
-    }
-
-    pub fn coeffs(&self) -> Rc<Vec<T>> {
-        self.coeffs.clone()
-    }
-}
-
 /// # Example: 
 /// ```
 /// use bored_algebra::polynomials::Polynomial;
@@ -39,9 +23,39 @@ impl<T: RingType> Polynomial<T> {
 /// assert_eq!(p.degree(), 2_u64);
 /// assert_eq!(p.coeffs(), Rc::new(vec));
 /// ```
-impl<T: RingType> From<Vec<T>> for Polynomial<T> {
+#[derive(Debug, Clone)]
+pub struct Polynomial<T> {
+    coeffs: Rc<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
+    deg: u64,
+}
+
+impl<T> Polynomial<T> {
+    pub fn degree(&self) -> u64 {
+        self.deg 
+    }
+
+    pub fn coeffs(&self) -> Rc<Vec<T>> {
+        self.coeffs.clone()
+    }
+
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl<T> Default for Polynomial<T> {
+    fn default() -> Self {
+        Self {
+            coeffs: Rc::new(Vec::new()),
+            deg: 0,
+        }
+    }
+}
+
+impl<T> From<Vec<T>> for Polynomial<T> {
     fn from(vec: Vec<T>) -> Self {
 
+        /*
         // the degree is the maximum of the indices of nonzero coefficients
         let degree = match vec.iter().rposition(|coeff| *coeff != T::zero()) {
             Some(index) => index as u64,
@@ -52,10 +66,12 @@ impl<T: RingType> From<Vec<T>> for Polynomial<T> {
             coeffs: Rc::new(vec),
             deg: degree,
         }
+        */ 
+        todo!();
     }
 }
 
-impl<T: RingType> Into<Vec<T>> for Polynomial<T> {
+impl<T: Clone> Into<Vec<T>> for Polynomial<T> {
     fn into(self) -> Vec<T> {
         (*self.coeffs()).clone()
     }
@@ -63,7 +79,7 @@ impl<T: RingType> Into<Vec<T>> for Polynomial<T> {
 
 /// Two polynomials are considered equal if they have the same degree, and for each index <=
 /// degree, the coeffients at that index are equal. 
-impl<T: RingType> PartialEq for Polynomial<T> {
+impl<T: PartialEq> PartialEq for Polynomial<T> {
     fn eq(&self, other: &Self) -> bool {
         let lhs_deg = self.degree();
         let rhs_deg = other.degree();
@@ -85,10 +101,10 @@ impl<T: RingType> PartialEq for Polynomial<T> {
     }
 }
 
-impl<T: RingType> Eq for Polynomial<T> {}
+impl<T: Eq> Eq for Polynomial<T> {}
 
 /// The 1 of the polynomial ring is the 1 of its coeffient ring. 
-impl<T: RingType> One for Polynomial<T> {
+impl<T: One + Add + Zero + Eq> One for Polynomial<T> {
     fn one() -> Self {
         Self::from(vec![T::one()])
     }
@@ -103,7 +119,7 @@ impl<T: RingType> One for Polynomial<T> {
 }
 
 /// The 0 of the polynomial ring is the 0 of its coefficient ring. 
-impl<T: RingType> Zero for Polynomial<T> {
+impl<T: Zero + Eq> Zero for Polynomial<T> {
     fn zero() -> Self {
         Self::from(vec![T::zero()])
     }
@@ -124,7 +140,7 @@ impl<T: RingType> RingType for Polynomial<T> {}
 /// \sum\_{i=0}^n a\_i x^i + \sum\_{j=0} b\_j x^j = \sum\_{i=0}^{\max(n,m)} (a_i + b_i) x^i
 /// $$
 /// where coefficients beyond the degree of the polynomial are taken to be zero. 
-impl<T: RingType> Add for Polynomial<T> {
+impl<T: Add + Zero> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
@@ -145,7 +161,7 @@ impl<T: RingType> Add for Polynomial<T> {
     }
 }
 
-impl<T: RingType> Neg for Polynomial<T> {
+impl<T: Neg> Neg for Polynomial<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
@@ -159,7 +175,7 @@ impl<T: RingType> Neg for Polynomial<T> {
     }
 }
 
-impl<T: RingType> Sub for Polynomial<T> {
+impl<T: Add + Sub + Neg + Zero> Sub for Polynomial<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
@@ -172,7 +188,7 @@ impl<T: RingType> Sub for Polynomial<T> {
 /// \Big(\sum\_{i=0}^n a\_i x^i\Big)\Big(\sum\_{j=0}^m b\_j x^j\Big) = 
 /// \sum\_{k=0}^{n+m} \sum\_{i = 0}^k a\_i b\_{k-i} x^k
 /// $$
-impl<T: RingType> Mul for Polynomial<T> {
+impl<T: Zero + Mul + Add> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
@@ -208,7 +224,7 @@ impl<T: RingType> Mul for Polynomial<T> {
     }
 }
 
-impl<T: RingType + Div> Div for Polynomial<T> {
+impl<T: Div> Div for Polynomial<T> {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self {
@@ -216,7 +232,7 @@ impl<T: RingType + Div> Div for Polynomial<T> {
     }
 }
 
-impl<T: RingType + Rem> Rem for Polynomial<T> {
+impl<T: Rem> Rem for Polynomial<T> {
     type Output = Self;
 
     fn rem(self, rhs: Self) -> Self {

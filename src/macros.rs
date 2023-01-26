@@ -105,6 +105,9 @@ one_impl!(f64, 1.0);
 /// integers_mod!(IntegerMod5, 5);
 /// ```
 /// The above generates a struct for $\mathbb{Z}/5\mathbb{Z}$. 
+/// # Note:
+/// If $n$ is prime, use `finite_field!` instead, to get access to 
+/// field-specific methods. 
 #[macro_export]
 macro_rules! integers_mod {
     ($name:ident, $char:expr) => {

@@ -1,6 +1,6 @@
 # Bored Algebra
 
-Library for constructions on rings, with a focus on iterators and finite fields.
+A library for constructions on rings.
 
 ## How 2 Use
 
@@ -20,5 +20,4 @@ git clone git@github.com:maxinebeckie/bored-algebra.git
 * Quotient rings (todo)
 * Finite fields (ie, GF(p, q). q > 1 is todo)
 * Iterators over special polynomials: irreducible, cyclotomic, .. (todo)
-* Iterators over primes in a ring (todo)
-* Localization of a ring (todo)
+* Localization of a commutative ring (todo)

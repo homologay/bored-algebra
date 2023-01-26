@@ -16,8 +16,26 @@ struct Polynomial<T: RingType> {
 
 //is the "from_" naming convention followed properly here?
 impl<T: RingType> Polynomial<T> {
-    fn from_vec(vec: Vec<T>) -> Self {
-        
+    fn degree(&self) -> u64 {
+        todo!(); 
+    }
+
+    fn coeffs(&self) -> Box<Vec<T>> {
+        todo!();
+    }
+}
+
+/// From
+/// ```
+/// let vec = vec![0, 1, 2];
+/// // x + 2x^2
+/// let p: Polynomial<usize> = Polynomial::from(vec.clone());
+/// assert_eq!(p.degree(), 2_u64);
+/// assert_eq!(p.coeffs(), Box::new(vec));
+/// ```
+impl<T: RingType> From<Vec<T>> for Polynomial<T> {
+    fn from(vec: Vec<T>) -> Self {
+
         // the degree is the maximum of the indices of nonzero coefficients
         let degree = match vec.iter().rposition(|coeff| *coeff != T::zero()) {
             Some(index) => index as u64,
@@ -29,25 +47,11 @@ impl<T: RingType> Polynomial<T> {
             deg: degree,
         }
     }
-
-    fn degree(&self) -> u64 {
-        todo!(); 
-    }
-
-    fn coeffs(&self) -> Box<Vec<T>> {
-        todo!();
-    }
-}
-
-impl<T: RingType> From<Vec<T>> for Polynomial<T> {
-    fn from(vec: Vec<T>) -> Self {
-        todo!();
-    }
 }
 
 impl<T: RingType> Into<Vec<T>> for Polynomial<T> {
     fn into(self) -> Vec<T> {
-        todo!();
+        *self.coeffs()
     }
 }
 

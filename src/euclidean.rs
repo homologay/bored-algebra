@@ -1,4 +1,4 @@
-//! Euclidean domains, algorithm, ..
+//! Euclidean domains.
 
 
 /// (extended) Euclidean Algorithm: returns gcd of two elements of a ring.

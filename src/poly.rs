@@ -14,7 +14,7 @@ use num_traits::identities::{Zero, One};
 /// recursively by using polynomials as the coefficients. 
 /// # Example: 
 /// ```
-/// use bored_algebra::polynomials::Polynomial;
+/// use bored_algebra::poly::Polynomial;
 /// use std::rc::Rc;
 ///
 /// let vec = vec![0, 1, 2];

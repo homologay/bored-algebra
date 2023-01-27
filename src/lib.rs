@@ -7,4 +7,4 @@ pub mod finite_fields;
 pub mod helpers;
 pub mod prime_generation;
 pub mod traits;
-pub mod polynomials;
+pub mod poly;

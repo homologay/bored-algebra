@@ -9,10 +9,7 @@ pub struct PrimeGenerator {
 
 impl Default for PrimeGenerator {
     fn default() -> Self {
-        Self { 
-            curr: 2, 
-            next: 3,
-        }
+        Self { curr: 2, next: 3 }
     }
 }
 

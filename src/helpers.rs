@@ -1,4 +1,4 @@
-//! Helper functions for the other modules 
+//! Helper functions for the other modules
 
 use crate::traits::RingType;
 use core::ops::Rem;

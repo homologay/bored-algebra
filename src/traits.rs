@@ -1,4 +1,4 @@
-//! Traits for rings 
+//! Traits for rings
 
 use core::fmt::{Debug, Display};
 use core::ops::{Add, Mul, Neg, Sub};

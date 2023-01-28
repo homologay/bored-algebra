@@ -4,15 +4,13 @@ use crate::traits::{IntegerModN, RingType};
 
 use std::fmt;
 use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Neg, Sub, Rem};
+use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::rc::Rc;
 
-use num_traits::identities::{Zero, One};
+use num_traits::identities::{One, Zero};
 
-/// A polynomial with coefficients in a ring `T`, represented as `Rc<Vec<T>>`. The coefficient for
-/// degree n is the element at index n in the vector. Multivariable polynomials can be constructed
-/// recursively by using polynomials as the coefficients. 
-/// # Example: 
+/// A polynomial with coefficients in `T`. 
+/// # Example:
 /// ```
 /// use bored_algebra::poly::Polynomial;
 /// use std::rc::Rc;
@@ -20,20 +18,19 @@ use num_traits::identities::{Zero, One};
 /// let vec = vec![0, 1, 2];
 /// // x + 2x^2
 /// let p: Polynomial<i64> = Polynomial::from(vec.clone());
-/// assert_eq!(p.degree(), 2_u64);
+/// assert_eq!(p.deg(), 2_u64);
 /// assert_eq!(p.coeffs(), Rc::new(vec));
 /// ```
 #[derive(Debug, Clone)]
 pub struct Polynomial<T> {
-    coeffs: Rc<Vec<T>>, //the coefficients in order, places core[0] is x^0, core[1] is x^1, so on.
+    coeffs: Rc<Vec<T>>, // index == deg 
     deg: u64,
 }
 
 impl<T> Polynomial<T> {
-    pub fn degree(&self) -> u64 {
-        self.deg 
+    pub fn deg(&self) -> u64 {
+        self.deg
     }
-
     pub fn coeffs(&self) -> Rc<Vec<T>> {
         self.coeffs.clone()
     }
@@ -52,47 +49,48 @@ impl<T> Default for Polynomial<T> {
     }
 }
 
-impl<T> From<Vec<T>> for Polynomial<T> {
+impl<T> From<Vec<T>> for Polynomial<T>
+where T: Zero + Eq {
     fn from(vec: Vec<T>) -> Self {
+        // if vec is empty, return 0 polynomial
+        if vec.is_empty() {
+            Self::default()
+        } else {
+            // otherwise, the degree is the maximum of the indices of nonzero coefficients
+            let degree = match vec.iter().rposition(|coeff| *coeff != T::zero()) {
+                Some(index) => index as u64,
+                None => 0 as u64,
+            };
 
-        /*
-        // the degree is the maximum of the indices of nonzero coefficients
-        let degree = match vec.iter().rposition(|coeff| *coeff != T::zero()) {
-            Some(index) => index as u64,
-            None => 0 as u64 ,
-        };
-
-        Self {
-            coeffs: Rc::new(vec),
-            deg: degree,
+            Self {
+                coeffs: Rc::new(vec),
+                deg: degree,
+            }
         }
-        */ 
-        todo!();
     }
 }
 
-impl<T: Clone> Into<Vec<T>> for Polynomial<T> {
-    fn into(self) -> Vec<T> {
-        (*self.coeffs()).clone()
-    }
-}
-
-/// Two polynomials are considered equal if they have the same degree, and for each index <=
-/// degree, the coeffients at that index are equal. 
-impl<T: PartialEq> PartialEq for Polynomial<T> {
+/// Two polynomials are equal if they have the same degree and all coefficients <= deg 
+/// are equal. 
+impl<T: Eq> PartialEq for Polynomial<T> {
     fn eq(&self, other: &Self) -> bool {
-        let lhs_deg = self.degree();
-        let rhs_deg = other.degree();
+        let lhs_deg = self.deg();
+        let rhs_deg = other.deg();
 
         if lhs_deg == rhs_deg {
             //iterate over (elem, index) of each, up to lhs_deg + 1,check all nonzero ones are equal
-            return self.coeffs().iter().enumerate().take((lhs_deg + 1).try_into().unwrap()).eq(other
-                .coeffs
+            return self
+                .coeffs()
                 .iter()
                 .enumerate()
-                .take((lhs_deg + 1).try_into().unwrap()));
+                .take((lhs_deg + 1).try_into().unwrap())
+                .eq(other
+                    .coeffs
+                    .iter()
+                    .enumerate()
+                    .take((lhs_deg + 1).try_into().unwrap()));
         } else {
-            return false; 
+            return false;
         }
     }
 
@@ -103,7 +101,7 @@ impl<T: PartialEq> PartialEq for Polynomial<T> {
 
 impl<T: Eq> Eq for Polynomial<T> {}
 
-/// The 1 of the polynomial ring is the 1 of its coeffient ring. 
+/// The 1 of the polynomial ring is the 1 of its coeffient ring.
 impl<T: One + Add + Zero + Eq> One for Polynomial<T> {
     fn one() -> Self {
         Self::from(vec![T::one()])
@@ -118,7 +116,7 @@ impl<T: One + Add + Zero + Eq> One for Polynomial<T> {
     }
 }
 
-/// The 0 of the polynomial ring is the 0 of its coefficient ring. 
+/// The 0 of the polynomial ring is the 0 of its coefficient ring.
 impl<T: Zero + Eq> Zero for Polynomial<T> {
     fn zero() -> Self {
         Self::from(vec![T::zero()])
@@ -139,14 +137,14 @@ impl<T: RingType> RingType for Polynomial<T> {}
 /// $$
 /// \sum\_{i=0}^n a\_i x^i + \sum\_{j=0} b\_j x^j = \sum\_{i=0}^{\max(n,m)} (a_i + b_i) x^i
 /// $$
-/// where coefficients beyond the degree of the polynomial are taken to be zero. 
+/// where coefficients beyond the degree of the polynomial are taken to be zero.
 impl<T: Add + Zero> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
         /* let sum = (*self
             .coeffs())       // *Rc<Vec<T>>
-            .iter()         
+            .iter()
             .zip_longest((*rhs.coeffs()).iter())
             .map(|elem| match elem {
                 Both(&a, &b) => a + b,
@@ -165,7 +163,6 @@ impl<T: Neg> Neg for Polynomial<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
-        
         /*
         let neg_coeffs = self.coeffs().into_iter().map(|elem| -elem).collect::<Vec<T>>();
 
@@ -185,14 +182,13 @@ impl<T: Add + Sub + Neg + Zero> Sub for Polynomial<T> {
 
 /// Polynomial multiplication. The notation in the code follows the formula
 /// $$
-/// \Big(\sum\_{i=0}^n a\_i x^i\Big)\Big(\sum\_{j=0}^m b\_j x^j\Big) = 
+/// \Big(\sum\_{i=0}^n a\_i x^i\Big)\Big(\sum\_{j=0}^m b\_j x^j\Big) =
 /// \sum\_{k=0}^{n+m} \sum\_{i = 0}^k a\_i b\_{k-i} x^k
 /// $$
 impl<T: Zero + Mul + Add> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-       
         /*
         //degrees of the polynomials lhs = n, rhs = m
         let lhs_vec = self.coeffs();
@@ -243,7 +239,7 @@ impl<T: Rem> Rem for Polynomial<T> {
 #[cfg(test)]
 mod test {
     use super::*;
-    
+
     /*
     #[test]
     fn polynomial_arithmetic() {
@@ -367,5 +363,4 @@ mod test {
 
         //indexing confusion ....................................
     }*/
-
 }

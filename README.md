@@ -1,23 +1,45 @@
 # Bored Algebra
 
-A library for constructions on rings.
+This is a library, still in its very early stages. The core focus is on implementing
+the following:
 
-## How 2 Use
+  * Polynomials over a ring
+  * Ideals, limiting to the finitely-generated case
+  * Quotient rings
+  * UFD's, PID's, Euclidean domains
+  * Localization of a commutative ring
 
-1. Don't, yet. This project is still in early stages.
+With the abstract constructions, we can get the following (and more!) mostly for free:
 
-2. Clone the repo:
-```sh
-git clone https://github.com/maxinebeckie/bored-algebra.git
-```
-```sh
-git clone git@github.com:maxinebeckie/bored-algebra.git
-```
-## Features
+  * Finite fields
+  * Rational function fields
+  * Integers modulo a number
+  * Rational numbers
+  * Multivariable polynomials
 
-* Polynomial arithmetic over a ring (in progress)
-* Integers mod n (works, but more methods are todo)
-* Quotient rings (todo)
-* Finite fields (ie, GF(p, q). q > 1 is todo)
-* Iterators over special polynomials: irreducible, cyclotomic, .. (todo)
-* Localization of a commutative ring (todo)
+## Goals
+
+* Implement the above
+* Implement iterator traits for the above
+* Integrate with rand to generate random elements of a specific ring
+* Follow rust API best practices
+* Non-painful interaction with popular math libraries like nalgebra, num-traits, ..
+* Turn this from an exercise in macros and generics into something
+  actually useful. Eventually! Maybe!
+
+## Non-goals
+
+* Be an application
+* Be fast
+* Be cryptographically secure
+* Get deep into the algebra traits business -- there's plenty of good
+  crates for that, like alga. 
+
+## Status
+
+* Prime generation works and is very slow
+* Polynomials are being reworked (implementation 3 I think)
+* There's a passable implementation of Z/nZ
+* Will probably remove it once quotient rings are implemented, though. 
+* Euclidean algorithm is being worked on
+* Using proc macros for quotients and localization is probably the best bet..

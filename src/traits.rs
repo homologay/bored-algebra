@@ -48,12 +48,31 @@ pub trait RingType:
 {
 }
 
+/// An element of a group
+pub trait GroupType:
+    Eq + Add<Output = Self> + Neg<Output = Self> + Sub<Output = Self> + Zero + Clone + Debug
+{
+}
+
+/// A group homomorphism
+pub trait GroupHomo<A: GroupType, B: GroupType>: Fn(A) -> B {}
+
+/// A ring homomorphism
+pub trait RingHomo<A: RingType, B: RingType>: Fn(A) -> B {}
+
 impl RingType for isize {}
 impl RingType for i8 {}
 impl RingType for i16 {}
 impl RingType for i32 {}
 impl RingType for i64 {}
 impl RingType for i128 {}
+
+impl GroupType for isize {}
+impl GroupType for i8 {}
+impl GroupType for i16 {}
+impl GroupType for i32 {}
+impl GroupType for i64 {}
+impl GroupType for i128 {}
 
 ///for an element of an integral domain
 pub trait Integral: RingType {}

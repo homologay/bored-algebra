@@ -4,18 +4,20 @@ This is a library, still in its very early stages. The core focus is on implemen
 the following:
 
   * Polynomials over a ring
-  * Ideals, limiting to the finitely-generated case
+  * Finitely-generated ideals
   * Quotient rings
-  * UFD's, PID's, Euclidean domains
+  * Principal ideal domains (PIDs)
+  * Unique factorization domains (UFDs)
+  * Euclidean domains
   * Localization of a commutative ring
 
-With the abstract constructions, we can get the following (and more!) mostly for free:
+With these abstract constructions, we can get the following (and more!) mostly for free.
 
-  * Finite fields
-  * Rational function fields
-  * Integers modulo a number
-  * Rational numbers
+  * (maybe) field of fractions 
+  * Z/nZ
+  * Finite fields, ie. GF(p, q)
   * Multivariable polynomials
+  * Factorization algorithms that work on many things, like polynomials, integers, ...
 
 ## Goals
 
@@ -23,7 +25,7 @@ With the abstract constructions, we can get the following (and more!) mostly for
 * Implement iterator traits for the above
 * Integrate with rand to generate random elements of a specific ring
 * Follow rust API best practices
-* Non-painful interaction with popular math libraries like nalgebra, num-traits, ..
+* Non-painful interaction with popular math libraries like nalgebra, num-traits, alga, ...
 * Turn this from an exercise in macros and generics into something
   actually useful. Eventually! Maybe!
 
@@ -32,14 +34,12 @@ With the abstract constructions, we can get the following (and more!) mostly for
 * Be an application
 * Be fast
 * Be cryptographically secure
-* Get deep into the algebra traits business -- there's plenty of good
-  crates for that, like alga. 
+* Get deep into the algebra traits business - ideally traits should be hardcoded unless
+  trait crates like num-traits, alga, are a dependency on the user's project (is this possible?) 
 
 ## Status
 
 * Prime generation works and is very slow
-* Polynomials are being reworked (implementation 3 I think)
-* There's a passable implementation of Z/nZ
-* Will probably remove it once quotient rings are implemented, though. 
+* Polynomials are being reworked (implementation 3)
+* There's a passable implementation of Z/nZ that will be removed once quotient rings are implemented
 * Euclidean algorithm is being worked on
-* Using proc macros for quotients and localization is probably the best bet..

@@ -2,14 +2,12 @@
 use crate::integers_mod;
 use crate::traits::{IntegerModN, RingType};
 
-use std::fmt;
-use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::rc::Rc;
 
 use num_traits::identities::{One, Zero};
 
-/// A polynomial with coefficients in `T`. 
+/// A polynomial with coefficients in `T`.
 /// # Example:
 /// ```
 /// use bored_algebra::poly::Polynomial;
@@ -23,7 +21,7 @@ use num_traits::identities::{One, Zero};
 /// ```
 #[derive(Debug, Clone)]
 pub struct Polynomial<T> {
-    coeffs: Rc<Vec<T>>, // index == deg 
+    coeffs: Rc<Vec<T>>, // index == deg
     deg: u64,
 }
 
@@ -38,6 +36,27 @@ impl<T> Polynomial<T> {
     pub fn new() -> Self {
         Self::default()
     }
+
+    /// Takes two polynomials. If the first is higher or equal degree, return true. Otherwise, return false.
+    pub fn compare_deg(&self, other: &Self) -> bool {
+        let self_deg = self.deg();
+        let other_deg = other.deg();
+
+        match self_deg >= other_deg {
+            true => true,
+            false => false,
+        }
+    }
+
+    /// multiply, assuming rhs has lower or equal degree to self.
+    fn mul_pad_second(self, rhs: Self) -> Self {
+        todo!();
+    }
+
+    /// add, assuming rhs has lower or equal degree to self.
+    fn add_pad_second(self, rhs: Self) -> Self {
+        todo!();
+    }
 }
 
 impl<T> Default for Polynomial<T> {
@@ -50,7 +69,9 @@ impl<T> Default for Polynomial<T> {
 }
 
 impl<T> From<Vec<T>> for Polynomial<T>
-where T: Zero + Eq {
+where
+    T: Zero + Eq,
+{
     fn from(vec: Vec<T>) -> Self {
         // if vec is empty, return 0 polynomial
         if vec.is_empty() {
@@ -70,8 +91,8 @@ where T: Zero + Eq {
     }
 }
 
-/// Two polynomials are equal if they have the same degree and all coefficients <= deg 
-/// are equal. 
+/// Two polynomials are equal if they have the same degree and all coefficients <= deg
+/// are equal.
 impl<T: Eq> PartialEq for Polynomial<T> {
     fn eq(&self, other: &Self) -> bool {
         let lhs_deg = self.deg();
@@ -142,20 +163,13 @@ impl<T: Add + Zero> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        /* let sum = (*self
-            .coeffs())       // *Rc<Vec<T>>
-            .iter()
-            .zip_longest((*rhs.coeffs()).iter())
-            .map(|elem| match elem {
-                Both(&a, &b) => a + b,
-                Left(&b) => b,
-                Right(&a) => a,
-            })
-            .collect();
-
-        Self::from_vec(sum)
-        */
-        todo!();
+        if Self::compare_deg(&self, &rhs) {
+            // pad rhs
+            Self::add_pad_second(self, rhs)
+        } else {
+            // pad self
+            Self::add_pad_second(rhs, self)
+        }
     }
 }
 
@@ -239,6 +253,30 @@ impl<T: Rem> Rem for Polynomial<T> {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_from() {
+        let vec1 = vec![1, 2, 3, 4, 0, 0, 0, 0, 0, 0];
+        let vec2 = vec![1, 2, 3, 4];
+        let vec3 = vec![1, 2, 3, 4, 0, 1];
+
+        let poly1 = Polynomial::from(vec1);
+        let poly2 = Polynomial::from(vec2);
+        let poly3 = Polynomial::from(vec3);
+
+        assert_eq!(poly1, poly2);
+        assert_ne!(poly1, poly3);
+        assert_ne!(poly2, poly3);
+    }
+
+    #[test]
+    fn test_compare_deg() {
+        //x + x^2
+        let a = Polynomial::<i64>::from(vec![0, 1, 1]);
+        //1 + x, with a bunch of extra zeros
+        let b = Polynomial::<i64>::from(vec![1, 1, 0, 0, 0, 0]);
+        assert_eq!(Polynomial::compare_deg(&a, &b), true);
+    }
 
     /*
     #[test]

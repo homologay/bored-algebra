@@ -1,45 +1,54 @@
 # Bored Algebra
 
-This is a library, still in its very early stages. The core focus is on implementing
-the following:
-
-  * Polynomials over a ring
-  * Finitely-generated ideals
-  * Quotient rings
-  * Principal ideal domains (PIDs)
-  * Unique factorization domains (UFDs)
-  * Euclidean domains
-  * Localization of a commutative ring
-
-With these abstract constructions, we can get the following (and more!) mostly for free.
-
-  * (maybe) field of fractions 
-  * Z/nZ
-  * Finite fields, ie. GF(p, q)
-  * Multivariable polynomials
-  * Factorization algorithms that work on many things, like polynomials, integers, ...
-
-## Goals
-
-* Implement the above
-* Implement iterator traits for the above
-* Integrate with rand to generate random elements of a specific ring
-* Follow rust API best practices
-* Non-painful interaction with popular math libraries like nalgebra, num-traits, alga, ...
-* Turn this from an exercise in macros and generics into something
-  actually useful. Eventually! Maybe!
-
-## Non-goals
-
-* Be an application
-* Be fast
-* Be cryptographically secure
-* Get deep into the algebra traits business - ideally traits should be hardcoded unless
-  trait crates like num-traits, alga, are a dependency on the user's project (is this possible?) 
+This is a math library, broadly about "generically making new rings from rings". 
 
 ## Status
 
-* Prime generation works and is very slow
-* Polynomials are being reworked (implementation 3)
-* There's a passable implementation of Z/nZ that will be removed once quotient rings are implemented
-* Euclidean algorithm is being worked on
+Early, early stages. Once the goals and core features are complete I will make a `CONTRIBUTING.md`. 
+
+## Features in progress
+
+* Polynomials over a ring
+* Z/nZ (to be subsumed by quotient rings once those are completed)
+
+## Planned features
+
+*Core* 
+* Using traits for algebraic structures from `alga` or `num-traits` instead of bespoke ones
+* Finitely generated (f.g.) ideals
+* Quotient rings
+* PIDs (principal ideal domains)
+* UFDs (unique factorization domains)
+* Euclidean domains
+* Localization of a commutative ring at a f.g. ideal
+* (co)limits of groups/rings
+* (co)products of groups/rings
+* Modules
+* Tensor products
+* Gr'\0xd6'bner bases
+* Iterator implementations for the above
+*Feature-gated*
+* `rand` integration to generate random elements of specific rings
+* (nightly) specialization to allow people to reimplement algorithms for their own types
+(for example, to use an algorithm optimized for GF(2, 8) instead of the generic
+  GF(p, q) algorithm)
+
+## Goals / niche
+
+* An API that is generic and flexible, but not necessarily fast
+* Mathematicians should use the big tools, but maybe some of them like rust
+* Good documentation that integrates LaTeX and explains the relevant concepts
+
+## FAQ
+
+* Q. Will you consider changing the license?
+  A. No.
+
+* Q. Why use an Rc for Polynomial<T>? 
+  A. It's taking a performance hit to avoid the spaghetti code that I've seen in order to
+  do generic things with references. If you think there's a better way, please let me know!
+  The way it is now, to add polynomials and still use them later, just clone them, since 
+  it just clones the Rc inside, so is pretty cheap (I think??)  
+
+* Q. Will you make this a crate?
+  A. Yes, if it gets useful enough that other people want to work on it

@@ -35,7 +35,7 @@ Early, early stages. Once the goals and core features are complete I will make a
 * An API that is generic and flexible, but not necessarily fast
 * Good documentation that integrates LaTeX and explains the relevant concepts
 
-## Status
+## Progress updates
 
 * There's a passable Z/nZ implementation that will be removed once quotient rings are implemented
 * Polynomial arithmetic is in progress

@@ -2,6 +2,9 @@
 use crate::integers_mod;
 use crate::traits::{IntegerModN, RingType};
 
+use std::fmt;
+use std::fmt::Display;
+use std::iter::once;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::rc::Rc;
 
@@ -25,7 +28,7 @@ pub struct Polynomial<T> {
     deg: u64,
 }
 
-impl<T> Polynomial<T> {
+impl<T: RingType> Polynomial<T> {
     pub fn deg(&self) -> u64 {
         self.deg
     }
@@ -55,7 +58,26 @@ impl<T> Polynomial<T> {
 
     /// add, assuming rhs has lower or equal degree to self.
     fn add_pad_second(self, rhs: Self) -> Self {
-        todo!();
+        let pad_len = &self.deg() - &rhs.deg();
+        let zero = T::zero();
+        let padding = once(&zero).cycle().take(pad_len.try_into().unwrap());
+        if pad_len == 0 {
+            Polynomial::from(
+                self.coeffs()
+                    .iter()
+                    .zip(rhs.coeffs().iter())
+                    .map(|(a, b)| (*a).clone() + (*b).clone())
+                    .collect::<Vec<T>>(),
+            )
+        } else {
+            Polynomial::from(
+                self.coeffs()
+                    .iter()
+                    .zip(rhs.coeffs().iter().chain(padding))
+                    .map(|(a, b)| (*a).clone() + (*b).clone())
+                    .collect::<Vec<T>>(),
+            )
+        }
     }
 }
 
@@ -70,7 +92,7 @@ impl<T> Default for Polynomial<T> {
 
 impl<T> From<Vec<T>> for Polynomial<T>
 where
-    T: Zero + Eq,
+    T: RingType,
 {
     fn from(vec: Vec<T>) -> Self {
         // if vec is empty, return 0 polynomial
@@ -93,7 +115,7 @@ where
 
 /// Two polynomials are equal if they have the same degree and all coefficients <= deg
 /// are equal.
-impl<T: Eq> PartialEq for Polynomial<T> {
+impl<T: RingType> PartialEq for Polynomial<T> {
     fn eq(&self, other: &Self) -> bool {
         let lhs_deg = self.deg();
         let rhs_deg = other.deg();
@@ -120,10 +142,10 @@ impl<T: Eq> PartialEq for Polynomial<T> {
     }
 }
 
-impl<T: Eq> Eq for Polynomial<T> {}
+impl<T: RingType> Eq for Polynomial<T> {}
 
 /// The 1 of the polynomial ring is the 1 of its coeffient ring.
-impl<T: One + Add + Zero + Eq> One for Polynomial<T> {
+impl<T: RingType> One for Polynomial<T> {
     fn one() -> Self {
         Self::from(vec![T::one()])
     }
@@ -138,7 +160,7 @@ impl<T: One + Add + Zero + Eq> One for Polynomial<T> {
 }
 
 /// The 0 of the polynomial ring is the 0 of its coefficient ring.
-impl<T: Zero + Eq> Zero for Polynomial<T> {
+impl<T: RingType> Zero for Polynomial<T> {
     fn zero() -> Self {
         Self::from(vec![T::zero()])
     }
@@ -159,7 +181,7 @@ impl<T: RingType> RingType for Polynomial<T> {}
 /// \sum\_{i=0}^n a\_i x^i + \sum\_{j=0} b\_j x^j = \sum\_{i=0}^{\max(n,m)} (a_i + b_i) x^i
 /// $$
 /// where coefficients beyond the degree of the polynomial are taken to be zero.
-impl<T: Add + Zero> Add for Polynomial<T> {
+impl<T: RingType> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
@@ -173,20 +195,20 @@ impl<T: Add + Zero> Add for Polynomial<T> {
     }
 }
 
-impl<T: Neg> Neg for Polynomial<T> {
+impl<T: RingType> Neg for Polynomial<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
-        /*
-        let neg_coeffs = self.coeffs().into_iter().map(|elem| -elem).collect::<Vec<T>>();
-
-        Self::from(neg_coeffs)
-        */
-        todo!();
+        Polynomial::from(
+            self.coeffs()
+                .iter()
+                .map(|a| -((*a).clone()))
+                .collect::<Vec<T>>(),
+        )
     }
 }
 
-impl<T: Add + Sub + Neg + Zero> Sub for Polynomial<T> {
+impl<T: RingType> Sub for Polynomial<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
@@ -199,42 +221,21 @@ impl<T: Add + Sub + Neg + Zero> Sub for Polynomial<T> {
 /// \Big(\sum\_{i=0}^n a\_i x^i\Big)\Big(\sum\_{j=0}^m b\_j x^j\Big) =
 /// \sum\_{k=0}^{n+m} \sum\_{i = 0}^k a\_i b\_{k-i} x^k
 /// $$
-impl<T: Zero + Mul + Add> Mul for Polynomial<T> {
+impl<T: RingType> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        /*
-        //degrees of the polynomials lhs = n, rhs = m
-        let lhs_vec = self.coeffs();
-        let rhs_vec = rhs.coeffs();
-        let n = &lhs_vec.len() - 1;
-        let m = &rhs_vec.len() - 1;
-
-        // the formula:
-        //\sum_{k=0}^n a_k x^k \sum_{k=0}^m b_k x^k = \sum_{k=0}^{n+m} \sum_{i=0}^k a_i b_{k-i} x^k
-
-        let mut result = Vec::new();
-
-        for k in 0..=(n + m) {
-            let mut kth_coeff = T::zero();
-
-            for i in 0..=k {
-                match (i > n) || ((k - i) > m) {
-                    true => (),
-                    false => {
-                        kth_coeff = kth_coeff + (lhs_vec[i].clone() * rhs_vec[k - i].clone());
-                    }
-                }
-            }
-            result.push(kth_coeff);
+        if Self::compare_deg(&self, &rhs) {
+            // pad rhs
+            Self::mul_pad_second(self, rhs)
+        } else {
+            // pad self
+            Self::mul_pad_second(rhs, self)
         }
-        Self::from(result)
-        */
-        todo!();
     }
 }
 
-impl<T: Div> Div for Polynomial<T> {
+impl<T: RingType> Div for Polynomial<T> {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self {
@@ -242,7 +243,7 @@ impl<T: Div> Div for Polynomial<T> {
     }
 }
 
-impl<T: Rem> Rem for Polynomial<T> {
+impl<T: RingType> Rem for Polynomial<T> {
     type Output = Self;
 
     fn rem(self, rhs: Self) -> Self {
@@ -271,56 +272,68 @@ mod test {
 
     #[test]
     fn test_compare_deg() {
-        //x + x^2
+        //x + x^2 over Z
         let a = Polynomial::<i64>::from(vec![0, 1, 1]);
-        //1 + x, with a bunch of extra zeros
+        //1 + x over Z, with a bunch of extra zeros
         let b = Polynomial::<i64>::from(vec![1, 1, 0, 0, 0, 0]);
         assert_eq!(Polynomial::compare_deg(&a, &b), true);
     }
 
-    /*
     #[test]
-    fn polynomial_arithmetic() {
-        //addition and subtraction
+    fn test_neg() {
+        //x + x^2 over Z
+        let a = Polynomial::<i64>::from(vec![0, 1, 1]); //
+        assert_eq!(-a, Polynomial::<i64>::from(vec![0, -1, -1]));
+    }
 
+    #[test]
+    fn test_sub() {
+        //x + x^2 over Z
+        let a = Polynomial::<i64>::from(vec![0, 1, 1]);
+        //1 + x over Z, with a bunch of extra zeros
+        let b = Polynomial::<i64>::from(vec![1, 1, 0, 0, 0, 0]);
+        assert_eq!(a - b, Polynomial::<i64>::from(vec![-1, 0, 1]));
+    }
+
+    #[test]
+    fn test_add() {
         // over Z
         // x + 1
-        let z1 = Polynomial::<i64>::from_vec(vec![1, 1]);
+        let z1 = Polynomial::<i64>::from(vec![1, 1]);
         // 2x^2 - 1
-        let z2 = Polynomial::<i64>::from_vec(vec![-1, 0, 2]);
+        let z2 = Polynomial::<i64>::from(vec![-1, 0, 2]);
 
         // x + 1 + 2x^2 - 1 = 2x^2 + x
         assert_eq!(
             z1.clone() + z2.clone(),
-            Polynomial::<i64>::from_vec(vec![0, 1, 2])
+            Polynomial::<i64>::from(vec![0, 1, 2])
         );
 
         // x + 1 - (2x^2 - 1) = -2x^2 + x + 2
         assert_eq!(
             z1.clone() - z2.clone(),
-            Polynomial::<i64>::from_vec(vec![2, 1, -2])
+            Polynomial::<i64>::from(vec![2, 1, -2])
         );
 
         // over Z/4Z
         integers_mod!(IntegerMod4, 4);
 
         // 1 + 3x + 2x^3
-        let mod1 = Polynomial::<IntegerMod4>::from_vec(vec![
+        let mod1 = Polynomial::<IntegerMod4>::from(vec![
             IntegerMod4::new(1),
             IntegerMod4::new(3),
             IntegerMod4::new(0),
             IntegerMod4::new(2),
         ]);
         // x + 3
-        let mod2 =
-            Polynomial::<IntegerMod4>::from_vec(vec![IntegerMod4::new(3), IntegerMod4::new(1)]);
+        let mod2 = Polynomial::<IntegerMod4>::from(vec![IntegerMod4::new(3), IntegerMod4::new(1)]);
         let mod_sum = mod1.clone() + mod2.clone();
         let mod_diff = mod1.clone() - mod2.clone();
 
         // 1 + 3x + 2x^3 + x + 3 = 2x^3
         assert_eq!(
             mod_sum,
-            Polynomial::<IntegerMod4>::from_vec(vec![
+            Polynomial::<IntegerMod4>::from(vec![
                 IntegerMod4::new(0),
                 IntegerMod4::new(0),
                 IntegerMod4::new(0),
@@ -331,14 +344,18 @@ mod test {
         // 1 + 3x + 2x^3 - (x + 3) = 2 + 2x + 2x^3
         assert_eq!(
             mod_diff,
-            Polynomial::<IntegerMod4>::from_vec(vec![
+            Polynomial::<IntegerMod4>::from(vec![
                 IntegerMod4::new(2),
                 IntegerMod4::new(2),
                 IntegerMod4::new(0),
                 IntegerMod4::new(2)
             ])
         );
+    }
 
+    /*
+    #[test]
+    fn test_mul() {
         //multiplication
 
         // over Z/4Z
@@ -366,8 +383,8 @@ mod test {
         //                        = 2x^4 + 2x^3 + x + 3
         assert_eq!(mod_prod, mod_expected);
         //got:
-    }*/
-
+    }
+    */
     /*
     #[test]
     fn multivariable_polynomial_arithmetic() {

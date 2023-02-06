@@ -1,7 +1,17 @@
 //! Helper functions for the other modules
 
-use crate::traits::RingType;
+use crate::traits::{GroupType, RingType};
 use core::ops::Rem;
+use std::iter::once;
+
+/// treating an (abelian) group as a Z-module with this multiplication --
+/// $n\times a = a + a + ... + a$, where the addition is performed $n$ times.
+pub fn mul_z_module<T: RingType>(n: i64, a: T) -> T {
+    once(a)
+        .cycle()
+        .take(n.try_into().unwrap())
+        .fold(T::zero(), |acc, a| acc + a)
+}
 
 ///non-optimized euler phi/totient function
 pub fn euler_phi_preop(n: i128) -> i128 {

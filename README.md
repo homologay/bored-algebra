@@ -1,20 +1,19 @@
 # Bored Algebra
 
-This is a math library about "generically making new rings from rings". 
+A library for rings, fields, polynomials, and such, built off `alga`'s algebraic traits. 
+This project is still in the early phases. Please let me know if you have ideas, as the
+feature list is not set in stone.
 
-## Status
-
-Early, early stages. Once the goals and core features are complete I will make a `CONTRIBUTING.md`. 
+## Planned Features
 
 **Core**
 
 * Polynomial rings 
-* Ideals (finitely-generated)
+* Finitely-generated ideals
 * Quotient rings
+* Hensel's Lemma
 * Localization of a commutative ring
 * Tensor products of rings
-* Property testing (with `quickcheck` or `proptest`)
-* Using traits for algebraic structures from `alga` or `num-traits` instead of bespoke ones
 
 **Maybe sometime**
 
@@ -23,19 +22,21 @@ Early, early stages. Once the goals and core features are complete I will make a
 * Euclidean domains
 * (co)limits
 
-**Feature-gated**
+**Feature-gated/Dev**
 
 * `rand` integration to generate random elements of specific rings
 * (nightly) specialization to allow people to reimplement algorithms for their own types
 (for example, to use an algorithm optimized for GF(2, 8) instead of the generic
   GF(p, q) algorithm)
+* `quickcheck` for testing that algebraic structures are what they say they are
 
 ## Goals / niche
 
 * An API that is generic and flexible, but not necessarily fast
 * Good documentation that integrates LaTeX and explains the relevant concepts
 
-## Progress updates
+## Status
 
+* Haven't moved to `alga` yet
 * There's a passable Z/nZ implementation that will be removed once quotient rings are implemented
 * Polynomial arithmetic is in progress

@@ -7,30 +7,6 @@ use std::hash::Hash;
 
 pub use num_traits::identities::{one, zero, One, Zero};
 
-/*
-///property of having a 0
-pub trait Zero: Sized + Add<Output = Self> {
-    fn zero() -> Self;
-
-    fn set_zero(&mut self) {
-        *self = Zero::zero();
-    }
-
-    fn is_zero(&self) -> bool;
-}
-
-///property of having a 1
-pub trait One: Sized + Mul<Self, Output = Self> {
-    fn one() -> Self;
-
-    fn set_one(&mut self) {
-        *self = One::one();
-    }
-
-    fn is_one(&self) -> bool;
-}
-*/
-
 ///encompasses all the structs made by integers_mod!, such as IntegersMod5
 pub trait IntegerModN: RingType + Copy + Display + Debug {}
 

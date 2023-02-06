@@ -1,4 +1,5 @@
 //! Polynomials
+use crate::helpers::mul_z_module;
 use crate::integers_mod;
 use crate::traits::{IntegerModN, RingType};
 
@@ -79,6 +80,22 @@ impl<T: RingType> Polynomial<T> {
             )
         }
     }
+
+    /// The derivative of a polynomial, given by the formula
+    /// $$
+    /// \frac{d}{dx} \sum\_{i=0}^{n}a\_i x^i = \sum_{i=1}^{n} i a\_i x^{i-1}
+    /// $$
+    /// where $i a\_i = a\_i + ... + a\_i$, with the addition being performed $n$ times.
+    pub fn derivative(self) -> Self {
+        Polynomial::from(
+            self.coeffs()
+                .iter()
+                .enumerate()
+                .skip(1)
+                .map(|(n, a)| mul_z_module(n.try_into().unwrap(), (*a).clone()))
+                .collect::<Vec<T>>(),
+        )
+    }
 }
 
 impl<T> Default for Polynomial<T> {
@@ -128,7 +145,7 @@ impl<T: RingType> PartialEq for Polynomial<T> {
                 .enumerate()
                 .take((lhs_deg + 1).try_into().unwrap())
                 .eq(other
-                    .coeffs
+                    .coeffs()
                     .iter()
                     .enumerate()
                     .take((lhs_deg + 1).try_into().unwrap()));
@@ -178,7 +195,7 @@ impl<T: RingType> RingType for Polynomial<T> {}
 
 /// Polynomial addition. The notation in the code follows the formula
 /// $$
-/// \sum\_{i=0}^n a\_i x^i + \sum\_{j=0} b\_j x^j = \sum\_{i=0}^{\max(n,m)} (a_i + b_i) x^i
+/// \sum\_{i=0}^n a\_i x^i + \sum\_{j=0} b\_j x^j = \sum\_{i=0}^{\max(n,m)} (a\_i + b\_i) x^i
 /// $$
 /// where coefficients beyond the degree of the polynomial are taken to be zero.
 impl<T: RingType> Add for Polynomial<T> {
@@ -353,6 +370,17 @@ mod test {
         );
     }
 
+    #[test]
+    fn test_derivative() {
+        // over Z
+        // x + 1
+        let z1 = Polynomial::<i64>::from(vec![1, 1]);
+        // 2x^2 - 1
+        let z2 = Polynomial::<i64>::from(vec![-1, 0, 2]);
+
+        assert_eq!(z1.derivative(), Polynomial::<i64>::from(vec![1]));
+        assert_eq!(z2.derivative(), Polynomial::<i64>::from(vec![0, 4]));
+    }
     /*
     #[test]
     fn test_mul() {

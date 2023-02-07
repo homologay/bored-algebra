@@ -2,7 +2,7 @@
 
 #![allow(unused_macros)]
 
-use crate::traits::{IntegerModN, RingType};
+use crate::ring_traits::{IntegerModN, RingType};
 use core::ops::{Add, Mul, Neg, Sub};
 use num_traits::{One, Zero};
 use std::fmt;

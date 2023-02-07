@@ -1,33 +1,27 @@
 # Bored Algebra
 
-A library for rings, fields, polynomials, and such, built off `alga`'s algebraic traits. 
-This project is still in the early phases. Please let me know if you have ideas, as the
-feature list is not set in stone.
+A commutative algebra library. This project is still in the early phases, so the API changes quite rapidly. I wouldn't recommend using it yet.
 
-## Planned Features
+## Math things that *might* be included at some point
 
-**Core**
-
+* Traits for rings, groups, modules
 * Polynomial rings 
+* Power series rings
 * Finitely-generated ideals
-* Quotient rings
+* Quotient things
+* Free things
 * Hensel's Lemma
 * Localization of a commutative ring
-* Tensor products of rings
-
-**Maybe sometime**
-
+* Tensor products of modules
 * PIDs (principal ideal domains)
 * UFDs (unique factorization domains)
 * Euclidean domains
 * (co)limits
+* Chain complexes, homology, Tor (not *that* Tor!), Ext
 
-**Feature-gated/Dev**
+## Programming things that will probably be implemented at some point
 
 * `rand` integration to generate random elements of specific rings
-* (nightly) specialization to allow people to reimplement algorithms for their own types
-(for example, to use an algorithm optimized for GF(2, 8) instead of the generic
-  GF(p, q) algorithm)
 * `quickcheck` for testing that algebraic structures are what they say they are
 
 ## Goals / niche
@@ -37,6 +31,12 @@ feature list is not set in stone.
 
 ## Status
 
-* Haven't moved to `alga` yet
 * There's a passable Z/nZ implementation that will be removed once quotient rings are implemented
 * Polynomial arithmetic is in progress
+* Rounding off traits, and quotient, free objects are next
+
+## About `alga`
+
+I've decided not to build off it for two reasons:
+1. It's not being actively developed
+2. Since I'm sticking in the realm of *nice* rings, groups, and modules, I don't need most of it

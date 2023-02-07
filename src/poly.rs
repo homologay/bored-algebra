@@ -1,7 +1,7 @@
 //! Polynomials
 use crate::helpers::mul_z_module;
 use crate::integers_mod;
-use crate::traits::{IntegerModN, RingType};
+use crate::ring_traits::{IntegerModN, RingType};
 
 use std::fmt;
 use std::fmt::Display;

@@ -1,7 +1,5 @@
 //! Tensor Products, as constructed in Atiyah-Macdonald
 
-use alga::general::Module;
-
 // ... need to implement first:
 //
 //           1. quotient module

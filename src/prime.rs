@@ -1,1 +1,0 @@
-//! Primes in a ring.

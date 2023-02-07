@@ -18,9 +18,9 @@ finite fields (from quotients, polynomials) or p-adic numbers (from completions)
 
 **abstractions**
 
-* rings
-* modules
-* abelian groups
+* modules => rings, abelian groups
+* submodules => ideals, subgroups
+* module homomorphisms => ring and group homomorphisms
 
 ! all rings are commutative in this house ! 
 

@@ -1,18 +1,23 @@
 use core::fmt::Debug;
 use core::ops::{Add, Mul, Neg, Sub};
 pub use num_traits::identities::{one, zero, One, Zero};
+use trait_set::trait_set;
 
-pub trait IntegerModN = RingType;
+trait_set! {
+    pub trait IntegerModN = RingType;
+}
 
-pub trait RingType = Eq
-    + Add<Output = Self>
-    + Neg<Output = Self>
-    + Sub<Output = Self>
-    + Mul<Output = Self>
-    + Zero
-    + One
-    + Clone
-    + Debug;
+trait_set! {
+    pub trait RingType = Eq
+        + Add<Output = Self>
+        + Neg<Output = Self>
+        + Sub<Output = Self>
+        + Mul<Output = Self>
+        + Zero
+        + One
+        + Clone
+        + Debug;
+}
 
 /// the type of an element of a module
 pub trait ModType<R: RingType> {

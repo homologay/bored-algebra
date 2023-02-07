@@ -1,7 +1,5 @@
 # Bored Algebra
 
-Commutative algebra in rust.
-
 This project is still in the early phases, so the API changes quite rapidly. 
 I wouldn't recommend using it yet.
 
@@ -14,20 +12,35 @@ many traits and macros as necessary. From this we can get a bunch of fun things,
 finite fields (from quotients, polynomials) or p-adic numbers (from completions). This 
 relation is written as '=>' below.
 
-## Math things that will be included at some point
+## Planned features / roadmap
 
-* Traits for groups, (commutative) rings, modules, subgroups, ideals, submodules
-* Polynomials
-* Quotient things
-* Free things
-* Localization of a commutative ring
-* Tensor products of modules
-* inverse limits => 
+**abstractions**
 
-* (co)limits
-* Chain complexes, homology, Tor (not *that* Tor!), Ext
+* rings
+* modules
+* abelian groups
+* nice algebras (maybe later)
 
-## Programming things that will probably be implemented at some point
+! all rings are commutative in this house ! 
+
+**constructions**
+
+* polynomials
+* quotient things
+* free things
+* localization
+* tensor products of modules
+* products => inverse limits => completions
+* disjoint unions => direct limits => some cursed stuff, apparently
+
+**homological things**
+
+* chain complexes of modules
+* homology of a chain complex
+* hom functor
+* cohomology of a chain complex
+
+**programming things**
 
 * `rand` integration to generate random elements of specific rings
 * `quickcheck` for testing that algebraic structures are what they say they are
@@ -35,11 +48,4 @@ relation is written as '=>' below.
 ## Status
 
 * There's a passable Z/nZ implementation that will be removed once quotient rings are implemented
-* Polynomial arithmetic is in progress
-* Rounding off traits, and quotient, free objects are next
-
-## About `alga`
-
-I've decided not to build off it for two reasons:
-1. It's not being actively developed
-2. Since I'm sticking in the realm of *nice* rings, groups, and modules, I don't need most of it
+* Current work is on polynomial arithmetic and abstractions. 

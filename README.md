@@ -1,5 +1,7 @@
 # Bored Algebra
 
+Commutative algebra in rust.
+
 This project is still in the early phases, so the API changes quite rapidly. 
 I wouldn't recommend using it yet.
 
@@ -10,7 +12,7 @@ a complicated system of traits, or a concrete implementation of one specific thi
 This library aims to implement general constructions in commutative algebra, using only as
 many traits and macros as necessary. From this we can get a bunch of fun things, like
 finite fields (from quotients, polynomials) or p-adic numbers (from completions). This 
-relation is written as '=>' below.
+'from' relation is written as '=>' below.
 
 ## Planned features / roadmap
 
@@ -19,7 +21,6 @@ relation is written as '=>' below.
 * rings
 * modules
 * abelian groups
-* nice algebras (maybe later)
 
 ! all rings are commutative in this house ! 
 
@@ -47,5 +48,6 @@ relation is written as '=>' below.
 
 ## Status
 
-* There's a passable Z/nZ implementation that will be removed once quotient rings are implemented
-* Current work is on polynomial arithmetic and abstractions. 
+* not much so far
+* current work is on abstractions and polynomial arithmetic
+* nightly compiler is req'd, for trait aliases

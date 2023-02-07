@@ -50,4 +50,3 @@ finite fields (from quotients, polynomials) or p-adic numbers (from completions)
 
 * not much so far
 * current work is on abstractions and polynomial arithmetic
-* nightly compiler is req'd, for trait aliases

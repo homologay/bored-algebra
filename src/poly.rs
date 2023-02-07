@@ -1,10 +1,7 @@
 //! Polynomials
 use crate::helpers::mul_z_module;
-use crate::integers_mod;
-use crate::ring_traits::{IntegerModN, RingType};
+use crate::module::RingType;
 
-use std::fmt;
-use std::fmt::Display;
 use std::iter::once;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::rc::Rc;
@@ -191,8 +188,6 @@ impl<T: RingType> Zero for Polynomial<T> {
     }
 }
 
-impl<T: RingType> RingType for Polynomial<T> {}
-
 /// Polynomial addition. The notation in the code follows the formula
 /// $$
 /// \sum\_{i=0}^n a\_i x^i + \sum\_{j=0} b\_j x^j = \sum\_{i=0}^{\max(n,m)} (a\_i + b\_i) x^i
@@ -330,43 +325,6 @@ mod test {
         assert_eq!(
             z1.clone() - z2.clone(),
             Polynomial::<i64>::from(vec![2, 1, -2])
-        );
-
-        // over Z/4Z
-        integers_mod!(IntegerMod4, 4);
-
-        // 1 + 3x + 2x^3
-        let mod1 = Polynomial::<IntegerMod4>::from(vec![
-            IntegerMod4::new(1),
-            IntegerMod4::new(3),
-            IntegerMod4::new(0),
-            IntegerMod4::new(2),
-        ]);
-        // x + 3
-        let mod2 = Polynomial::<IntegerMod4>::from(vec![IntegerMod4::new(3), IntegerMod4::new(1)]);
-        let mod_sum = mod1.clone() + mod2.clone();
-        let mod_diff = mod1.clone() - mod2.clone();
-
-        // 1 + 3x + 2x^3 + x + 3 = 2x^3
-        assert_eq!(
-            mod_sum,
-            Polynomial::<IntegerMod4>::from(vec![
-                IntegerMod4::new(0),
-                IntegerMod4::new(0),
-                IntegerMod4::new(0),
-                IntegerMod4::new(2)
-            ])
-        );
-
-        // 1 + 3x + 2x^3 - (x + 3) = 2 + 2x + 2x^3
-        assert_eq!(
-            mod_diff,
-            Polynomial::<IntegerMod4>::from(vec![
-                IntegerMod4::new(2),
-                IntegerMod4::new(2),
-                IntegerMod4::new(0),
-                IntegerMod4::new(2)
-            ])
         );
     }
 

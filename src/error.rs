@@ -1,6 +1,5 @@
 //! Errors for the library
 
-use anyhow;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -11,6 +10,4 @@ pub enum ArithmeticError {
     OutOfBounds,
     #[error("algorithm {alg:?} is not defined for element {el:?}")]
     AlgNotApplicable { alg: String, el: u64 },
-    #[error(transparent)]
-    Other(#[from] anyhow::Error),
 }

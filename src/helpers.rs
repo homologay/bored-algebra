@@ -1,7 +1,6 @@
 //! Helper functions for the other modules
 
-use crate::group_traits::GroupType;
-use crate::ring_traits::RingType;
+use crate::module::RingType;
 use core::ops::Rem;
 use std::iter::once;
 

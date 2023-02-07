@@ -1,21 +1,29 @@
 # Bored Algebra
 
-A commutative algebra library. This project is still in the early phases, so the API changes quite rapidly. I wouldn't recommend using it yet.
+Commutative algebra in rust.
 
-## Math things that *might* be included at some point
+This project is still in the early phases, so the API changes quite rapidly. 
+I wouldn't recommend using it yet.
 
-* Traits for rings, groups, modules
-* Polynomial rings 
-* Power series rings
-* Finitely-generated ideals
+## Motivation
+
+From browsing `crates.io` and `lib.rs`, it seems algebra crates are either 
+a complicated system of traits, or a concrete implementation of one specific thing. 
+This library aims to implement general constructions in commutative algebra, using only as
+many traits and macros as necessary. From this we can get a bunch of fun things, like
+finite fields (from quotients, polynomials) or p-adic numbers (from completions). This 
+relation is written as '=>' below.
+
+## Math things that will be included at some point
+
+* Traits for groups, (commutative) rings, modules, subgroups, ideals, submodules
+* Polynomials
 * Quotient things
 * Free things
-* Hensel's Lemma
 * Localization of a commutative ring
 * Tensor products of modules
-* PIDs (principal ideal domains)
-* UFDs (unique factorization domains)
-* Euclidean domains
+* inverse limits => 
+
 * (co)limits
 * Chain complexes, homology, Tor (not *that* Tor!), Ext
 
@@ -23,11 +31,6 @@ A commutative algebra library. This project is still in the early phases, so the
 
 * `rand` integration to generate random elements of specific rings
 * `quickcheck` for testing that algebraic structures are what they say they are
-
-## Goals / niche
-
-* An API that is generic and flexible, but not necessarily fast
-* Good documentation that integrates LaTeX and explains the relevant concepts
 
 ## Status
 

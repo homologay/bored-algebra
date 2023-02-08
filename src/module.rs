@@ -5,33 +5,30 @@ use trait_set::trait_set;
 
 trait_set! {
     pub trait IntegerModN = RingType;
-}
 
-trait_set! {
-    pub trait RingType = Eq
+    pub trait RingType = AbGroupType + Mul<Output = Self> + One;
+
+    pub trait AbGroupType =
+        Eq
         + Add<Output = Self>
         + Neg<Output = Self>
         + Sub<Output = Self>
-        + Mul<Output = Self>
         + Zero
-        + One
         + Clone
         + Debug;
 }
 
-/// the type of an element of a module
-pub trait ModType<R: RingType> {
+/// For a type that is a module. A ring is ModType<Self>, and a group is ModType<Z>.
+pub trait ModType<R: RingType>: AbGroupType {
     /// module multiplication
     fn mod_mul(r: R, m: Self) -> Self;
 }
 
-// then ring is Mod<Ring=Self, Ab=Self> and abelian group is Mod<Ring=Integer, Ab=Self>
-
 /// A module homomorphism A -> B
-pub trait Homo<R: RingType, A: ModType<R>, B: ModType<R>>: Fn(A) -> B + Zero {}
+pub trait Homo<R: RingType, A: ModType<R>, B: ModType<R>>: Fn(A) -> B + AbGroupType {}
 
 //composing two functions. maybe this will be useful, maybe not.
-fn compose<A, B, C, G, F>(g: G, f: F) -> (impl Fn(A) -> C)
+fn compose<A, B, C, G, F>(g: G, f: F) -> impl Fn(A) -> C
 where
     F: Fn(A) -> B,
     G: Fn(B) -> C,

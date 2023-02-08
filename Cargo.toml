@@ -3,9 +3,9 @@ name = "bored_algebra"
 version = "0.1.0"
 edition = "2021"
 authors = ["Maxine Beckie <maxbeckie@tutanota.com>"]
-description = "A math library focused on constructions on rings"
+description = "Yet Another Math Library"
 readme = "README.md"
-license = "MIT"
+license = "MIT with restrictions"
 
 [dependencies]
 thiserror = "1.0"

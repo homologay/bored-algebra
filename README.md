@@ -1,9 +1,9 @@
 # Bored Algebra
 
-Commutative algebra in rust.
+Commutative algebra in rust. Or, how-abstract-can-we-get-in-stable-rust?
 
-This project is still in the early phases, so the API changes quite rapidly. 
-I wouldn't recommend using it yet.
+This project is experimental, and I'm still a relative noob. I hope it will
+be useful at some point, however. 
 
 ## Motivation
 
@@ -48,5 +48,4 @@ finite fields (from quotients, polynomials) or p-adic numbers (from completions)
 
 ## Status
 
-* not much so far
-* current work is on abstractions and polynomial arithmetic
+* current work is on abstractions and polynomials

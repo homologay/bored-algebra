@@ -1,6 +1,7 @@
 use core::fmt::Debug;
 use core::ops::{Add, Mul, Neg, Sub};
 pub use num_traits::identities::{one, zero, One, Zero};
+use std::marker::PhantomData;
 use trait_set::trait_set;
 
 trait_set! {
@@ -25,10 +26,33 @@ pub trait ModType<R: RingType>: AbGroupType {
 }
 
 /// A module homomorphism A -> B
-pub trait Homo<R: RingType, A: ModType<R>, B: ModType<R>>: Fn(A) -> B + AbGroupType {}
+pub struct Homo<R: RingType, A: ModType<R>, B: ModType<R>> {
+    ring: PhantomData<R>,
+    function: Box<dyn Fn(A) -> B>,
+}
+
+impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {}
+
+impl<R: RingType, A: ModType<R>, B: ModType<R>> Add for Homo<R, A, B> {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self {
+        todo!();
+    }
+}
+
+fn compose<R, A, B, C>(g: Homo<R, B, C>, f: Homo<R, A, B>) -> Homo<R, A, C>
+where
+    R: RingType,
+    A: ModType<R>,
+    B: ModType<R>,
+    C: ModType<R>,
+{
+    todo!();
+}
 
 //composing two functions. maybe this will be useful, maybe not.
-fn compose<A, B, C, G, F>(g: G, f: F) -> impl Fn(A) -> C
+fn compose_functions<A, B, C, G, F>(g: G, f: F) -> impl Fn(A) -> C
 where
     F: Fn(A) -> B,
     G: Fn(B) -> C,

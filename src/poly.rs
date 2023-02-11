@@ -49,11 +49,6 @@ impl<T: RingType> Polynomial<T> {
         }
     }
 
-    /// multiply, assuming rhs has lower or equal degree to self.
-    fn mul_pad_second(self, rhs: Self) -> Self {
-        todo!();
-    }
-
     /// add, assuming rhs has lower or equal degree to self.
     fn add_pad_second(self, rhs: Self) -> Self {
         let pad_len = &self.deg() - &rhs.deg();
@@ -95,10 +90,11 @@ impl<T: RingType> Polynomial<T> {
     }
 }
 
-impl<T> Default for Polynomial<T> {
+/// The default is 0
+impl<T: RingType> Default for Polynomial<T> {
     fn default() -> Self {
         Self {
-            coeffs: Rc::new(Vec::new()),
+            coeffs: Rc::new(vec![T::zero()]),
             deg: 0,
         }
     }
@@ -237,13 +233,37 @@ impl<T: RingType> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        if Self::compare_deg(&self, &rhs) {
-            // pad rhs
-            Self::mul_pad_second(self, rhs)
-        } else {
-            // pad self
-            Self::mul_pad_second(rhs, self)
+        let self_deg: usize = (&self).deg().try_into().unwrap();
+        let rhs_deg: usize = (&rhs).deg().try_into().unwrap();
+
+        // pad both with zeros to index n + m
+        let zero = T::zero();
+        let self_padding = once(&zero).cycle().take(rhs_deg);
+        let rhs_padding = once(&zero).cycle().take(self_deg);
+
+        let ret_max_index: usize = (self_deg + rhs_deg).try_into().unwrap();
+        let mut ret = Vec::with_capacity(ret_max_index + 1);
+
+        for k in 0..ret_max_index {
+            ret.push(
+                self.clone()
+                    .coeffs()
+                    .iter()
+                    .chain(self_padding.clone())
+                    .take(k + 1)
+                    .zip(
+                        rhs.clone()
+                            .coeffs()
+                            .iter()
+                            .chain(rhs_padding.clone())
+                            .take(k + 1),
+                    )
+                    .map(|(self_coeff, rhs_coeff)| (*self_coeff).clone() * (*rhs_coeff).clone())
+                    .fold(zero.clone(), |acc, elem| acc + elem),
+            );
         }
+
+        Self::from(ret)
     }
 }
 
@@ -339,69 +359,61 @@ mod test {
         assert_eq!(z1.derivative(), Polynomial::<i64>::from(vec![1]));
         assert_eq!(z2.derivative(), Polynomial::<i64>::from(vec![0, 4]));
     }
-    /*
     #[test]
-    fn test_mul() {
-        //multiplication
-
-        // over Z/4Z
-        // 1 + 3x + 2x^3
-        let mod1 = Polynomial::<IntegerMod4>::from_vec(vec![
-            IntegerMod4::new(1),
-            IntegerMod4::new(3),
-            IntegerMod4::new(0),
-            IntegerMod4::new(2),
-        ]);
-        // x + 3
-        let mod2 =
-            Polynomial::<IntegerMod4>::from_vec(vec![IntegerMod4::new(3), IntegerMod4::new(1)]);
-
-        let mod_prod = mod1 * mod2;
-        let mod_expected = Polynomial::<IntegerMod4>::from_vec(vec![
-            IntegerMod4::new(3),
-            IntegerMod4::new(2),
-            IntegerMod4::new(3),
-            IntegerMod4::new(2),
-            IntegerMod4::new(2),
-        ]);
-
-        // (1 + 3x + 2x^3)(x + 3) = x + 3 + 3x^2 + 9x^2 + 2x^4 + 6x^3
-        //                        = 2x^4 + 2x^3 + x + 3
-        assert_eq!(mod_prod, mod_expected);
-        //got:
-    }
-    */
-    /*
-    #[test]
-    fn multivariable_polynomial_arithmetic() {
+    fn test_multivariable_add() {
         // in Z[x,y]
 
-        let one =
-            Polynomial::<Polynomial<i64>>::from_vec(vec![Polynomial::<i64>::from_vec(vec![1])]);
-        let zero =
-            Polynomial::<Polynomial<i64>>::from_vec(vec![Polynomial::<i64>::from_vec(vec![0])]);
+        let one = Polynomial::<Polynomial<i64>>::from(vec![Polynomial::<i64>::from(vec![1])]);
+        let zero = Polynomial::<Polynomial<i64>>::from(vec![Polynomial::<i64>::from(vec![0])]);
 
         // R(x,y) = -1 + xy
         // L(x,y) =  1 - xy
 
-        let r = Polynomial::<Polynomial<i64>>::from_vec(vec![
-            Polynomial::<i64>::from_vec(vec![-1]),   //ones
-            Polynomial::<i64>::from_vec(vec![0, 1]), //x's
+        let r = Polynomial::<Polynomial<i64>>::from(vec![
+            Polynomial::<i64>::from(vec![-1]),   //ones
+            Polynomial::<i64>::from(vec![0, 1]), //x's
         ]);
 
-        let l = Polynomial::<Polynomial<i64>>::from_vec(vec![
-            Polynomial::<i64>::from_vec(vec![1]),     //ones
-            Polynomial::<i64>::from_vec(vec![0, -1]), //x's
+        let l = Polynomial::<Polynomial<i64>>::from(vec![
+            Polynomial::<i64>::from(vec![1]),     //ones
+            Polynomial::<i64>::from(vec![0, -1]), //x's
         ]);
 
         assert_eq!(r + l, zero);
 
         // P(x,y) = xy + 3x^2 - 4y^2x - 8
-        let p =
-            Polynomial::<Polynomial<i64>>::from_vec(vec![Polynomial::<i64>::from_vec(vec![-8])]);
+        let p = Polynomial::<Polynomial<i64>>::from(vec![Polynomial::<i64>::from(vec![-8])]);
 
         // Q(x,y) = x^3 - 4y + 1
 
         //indexing confusion ....................................
-    }*/
+    }
+
+    #[test]
+    fn test_mul() {
+        // over Z
+
+        let one = Polynomial::<i64>::one();
+        let zero = Polynomial::<i64>::zero();
+
+        //assert_eq!(one.clone() * one.clone(), one.clone());
+        assert_eq!(zero.clone() * one.clone(), zero.clone());
+        assert_eq!(zero.clone() * zero.clone(), zero.clone());
+
+        let x = Polynomial::<i64>::from(vec![0, 1]);
+        let x_squared = Polynomial::<i64>::from(vec![0, 0, 1]);
+
+        assert_eq!(
+            x.clone() * x_squared.clone(),
+            Polynomial::<i64>::from(vec![0, 0, 0, 1])
+        );
+        assert_eq!(x.clone() * x.clone(), x_squared.clone());
+
+        // 1 + 3x + 2x^3
+        let a = Polynomial::<i64>::from(vec![1, 3, 2, 0, 0]);
+        // x + 3
+        let b = Polynomial::<i64>::from(vec![3, 1]);
+
+        assert_eq!(Polynomial::<i64>::from(vec![12, 1, 3, 6, 2]), a * b);
+    }
 }

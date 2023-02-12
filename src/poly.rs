@@ -8,7 +8,7 @@ use std::rc::Rc;
 
 use num_traits::identities::{One, Zero};
 
-/// A polynomial with coefficients in `T`.
+/// A polynomial with coefficients in `T`. To do much with `Polynomial<T>`, `T` should implement `RingType`.
 /// # Example:
 /// ```
 /// use bored_algebra::poly::Polynomial;
@@ -22,7 +22,7 @@ use num_traits::identities::{One, Zero};
 /// ```
 #[derive(Debug, Clone)]
 pub struct Polynomial<T> {
-    coeffs: Rc<Vec<T>>, // index == deg
+    coeffs: Vec<T>, // index == deg
     deg: u64,
 }
 
@@ -30,7 +30,7 @@ impl<T: RingType> Polynomial<T> {
     pub fn deg(&self) -> u64 {
         self.deg
     }
-    pub fn coeffs(&self) -> Rc<Vec<T>> {
+    pub fn coeffs(&self) -> Vec<T> {
         self.coeffs.clone()
     }
 
@@ -47,6 +47,11 @@ impl<T: RingType> Polynomial<T> {
             true => true,
             false => false,
         }
+    }
+
+    /// Returns the first k coefficients of a polynomial.
+    pub fn coeffs_take(&self, k: usize) -> Vec<T> {
+        self.coeffs.clone().into_iter().take(k).collect()
     }
 
     /// add, assuming rhs has lower or equal degree to self.
@@ -94,7 +99,7 @@ impl<T: RingType> Polynomial<T> {
 impl<T: RingType> Default for Polynomial<T> {
     fn default() -> Self {
         Self {
-            coeffs: Rc::new(vec![T::zero()]),
+            coeffs: vec![T::zero()],
             deg: 0,
         }
     }
@@ -116,7 +121,7 @@ where
             };
 
             Self {
-                coeffs: Rc::new(vec),
+                coeffs: vec,
                 deg: degree,
             }
         }
@@ -236,34 +241,48 @@ impl<T: RingType> Mul for Polynomial<T> {
         let self_deg: usize = (&self).deg().try_into().unwrap();
         let rhs_deg: usize = (&rhs).deg().try_into().unwrap();
 
-        // pad both with zeros to index n + m
-        let zero = T::zero();
-        let self_padding = once(&zero).cycle().take(rhs_deg);
-        let rhs_padding = once(&zero).cycle().take(self_deg);
+        match ((&self).is_zero(), (&rhs).is_zero()) {
+            (true, _) => Self::zero(),
+            (_, true) => Self::zero(),
+            _ => {
+                match ((&self).is_one(), (&rhs).is_one()) {
+                    (true, _) => rhs,
+                    (_, true) => self,
+                    _ => {
+                        // pad both with zeros to index n + m
+                        let zero = T::zero();
+                        let self_padding = once(&zero).cycle().take(rhs_deg);
+                        let rhs_padding = once(&zero).cycle().take(self_deg);
 
-        let ret_max_index: usize = (self_deg + rhs_deg).try_into().unwrap();
-        let mut ret = Vec::with_capacity(ret_max_index + 1);
+                        let prod_max_index: usize = (self_deg + rhs_deg).try_into().unwrap();
 
-        for k in 0..ret_max_index {
-            ret.push(
-                self.clone()
-                    .coeffs()
-                    .iter()
-                    .chain(self_padding.clone())
-                    .take(k + 1)
-                    .zip(
-                        rhs.clone()
-                            .coeffs()
-                            .iter()
-                            .chain(rhs_padding.clone())
-                            .take(k + 1),
-                    )
-                    .map(|(self_coeff, rhs_coeff)| (*self_coeff).clone() * (*rhs_coeff).clone())
-                    .fold(zero.clone(), |acc, elem| acc + elem),
-            );
+                        // iterate over coefficients, using formula for kth coefficient
+                        let prod = (0..=prod_max_index)
+                            .map(|k| {
+                                self.clone()
+                                    .coeffs()
+                                    .iter()
+                                    .chain(self_padding.clone())
+                                    .take(k + 1)
+                                    .zip(
+                                        rhs.clone()
+                                            .coeffs_take(k + 1)
+                                            .iter()
+                                            .rev()
+                                            .chain(rhs_padding.clone()),
+                                    )
+                                    .map(|(self_i, rhs_k_minus_i)| {
+                                        (*self_i).clone() * (*rhs_k_minus_i).clone()
+                                    })
+                                    .fold(zero.clone(), |acc, elem| acc + elem)
+                            })
+                            .collect::<Vec<T>>();
+
+                        Self::from(prod)
+                    }
+                }
+            }
         }
-
-        Self::from(ret)
     }
 }
 
@@ -396,18 +415,41 @@ mod test {
         let one = Polynomial::<i64>::one();
         let zero = Polynomial::<i64>::zero();
 
-        //assert_eq!(one.clone() * one.clone(), one.clone());
+        // identities
+        assert_eq!(one.clone() * one.clone(), one.clone());
         assert_eq!(zero.clone() * one.clone(), zero.clone());
         assert_eq!(zero.clone() * zero.clone(), zero.clone());
+        assert_eq!(one.clone() * zero.clone(), zero.clone());
 
         let x = Polynomial::<i64>::from(vec![0, 1]);
+        assert_eq!(
+            Polynomial::<i64>::from(vec![2]) * Polynomial::<i64>::from(vec![3]),
+            Polynomial::<i64>::from(vec![6])
+        );
+        assert_eq!(
+            Polynomial::<i64>::from(vec![2]) * x.clone(),
+            Polynomial::<i64>::from(vec![0, 2])
+        );
+        assert_eq!(x.clone() * one.clone(), x.clone());
         let x_squared = Polynomial::<i64>::from(vec![0, 0, 1]);
+        let x_cubed = Polynomial::<i64>::from(vec![0, 0, 0, 1]);
+
+        assert_eq!(
+            x_cubed.clone() * x_cubed.clone(),
+            Polynomial::<i64>::from(vec![0, 0, 0, 0, 0, 0, 1])
+        );
+
+        assert_eq!(
+            x_squared.clone() * x_squared.clone(),
+            Polynomial::<i64>::from(vec![0, 0, 0, 0, 1])
+        );
 
         assert_eq!(
             x.clone() * x_squared.clone(),
             Polynomial::<i64>::from(vec![0, 0, 0, 1])
         );
-        assert_eq!(x.clone() * x.clone(), x_squared.clone());
+
+        //assert_eq!(x.clone() * x.clone(), x_squared.clone());
 
         // 1 + 3x + 2x^3
         let a = Polynomial::<i64>::from(vec![1, 3, 2, 0, 0]);

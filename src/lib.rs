@@ -1,6 +1,11 @@
 //! Project root
 pub mod error;
+pub mod free;
 pub mod helpers;
+pub mod limits;
+pub mod local;
 pub mod module;
 pub mod poly;
+pub mod quotient;
+pub mod sub;
 pub mod tensor;

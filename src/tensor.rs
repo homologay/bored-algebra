@@ -1,4 +1,4 @@
-//! Tensor Products, as constructed in Atiyah-Macdonald
+//! Tensor Products
 
 // ... need to implement first:
 //
@@ -8,3 +8,20 @@
 //
 // (also need to learn how to use alga, which may be challenging, given the lack
 //  of available documentation)
+
+// some motivating examples from D&F:
+//
+//       1. for all R, N have     R tensor_R N = N
+//
+//       2. Extension of scalars for free modules:
+//
+//            N = R^n free module, then S tensor_R N = S^n.
+//
+//            eg. Q tensor_Z Z^n = Q^n and Z^n subgroup Q^n
+//
+//       4. Induced modules. R ring, G finite group, H subgroup G. Form group ring RG with subring RH.
+//        forall RH-module N define induced module RG tensor_RH N.
+//            ie. a way to obtain an RG-module for each RH-module.
+//
+//       5. tensors of direct sums distribute:
+//            (M plus M') tensor_R N = (M tensor_R N) plus (M' tensor_R N)

@@ -5,10 +5,10 @@ use std::marker::PhantomData;
 use trait_set::trait_set;
 
 trait_set! {
-    pub trait IntegerModN = RingType;
-
+    /// For rings
     pub trait RingType = AbGroupType + Mul<Output = Self> + One;
 
+    /// For abelian groups
     pub trait AbGroupType =
         Eq
         + Add<Output = Self>
@@ -19,19 +19,25 @@ trait_set! {
         + Debug;
 }
 
-/// For a type that is a module. A ring is ModType<Self>, and a group is ModType<Z>.
+/// For R-modules. Since this library is for commutative rings, it doesn't matter whether it's a left or right
+/// module. Let's say left, for the pedants. You could probably implement these traits for non-commutative
+/// multiplication, but, well, don't.
 pub trait ModType<R: RingType>: AbGroupType {
     /// module multiplication
     fn mod_mul(r: R, m: Self) -> Self;
 }
 
-/// A module homomorphism A -> B
+/// An R-module homomorphism A -> B.
 pub struct Homo<R: RingType, A: ModType<R>, B: ModType<R>> {
     ring: PhantomData<R>,
     function: Box<dyn Fn(A) -> B>,
 }
 
-impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {}
+impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
+    pub fn as_fn(self) -> impl Fn(A) -> B {
+        *self.function
+    }
+}
 
 impl<R: RingType, A: ModType<R>, B: ModType<R>> Add for Homo<R, A, B> {
     type Output = Self;

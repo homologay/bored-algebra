@@ -6,6 +6,6 @@ pub mod limits;
 pub mod local;
 pub mod module;
 pub mod poly;
+pub mod products;
 pub mod quotient;
 pub mod sub;
-pub mod tensor;

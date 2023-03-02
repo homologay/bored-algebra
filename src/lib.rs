@@ -1,6 +1,6 @@
 //! Project root
+pub use num_bigint::BigInt;
 pub mod error;
-pub mod free;
 pub mod helpers;
 pub mod limits;
 pub mod local;

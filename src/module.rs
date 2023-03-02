@@ -1,4 +1,24 @@
 //! Modules, homomorphisms
+//!
+//! The main thing here is the trait `ModType<R>`. There are some notable specific cases:
+//!     `ModType<Self>`        for rings, and
+//!     `ModType<BigInt>`      for abelian groups.
+//!
+//! Note, it is possible to implement `ModType<R>` for something that isn't an `R`-module. The trait
+//! can't be implemented arbitrarily, as it builds off of the `AbGroupType` and `RingType` traits,
+//! which are aliases that ensure the relevant operator overloads are there as well as some
+//! std traits like `Debug` to make working with them easier. These are done in stable rust thanks to
+//! the `trait-set` crate (this does make the documentation around `RingType` and `AbGroupType` a bit
+//! weird).  
+//!
+//! The user-defined type could fail one or more of the module axioms.
+//! At this time it is not know what behavior that will cause when using the constructions
+//! generic over `R`-modules.
+//!
+//! TODO: using quickcheck to check a user's type satisfies module axioms.
+//!
+//! TODO: making a ModType<Ring = Self> automatically implement ModType<Ring = BigInt>
+//! (but does this need specialization................uuuhhhhhhh)
 use core::fmt::Debug;
 use core::ops::{Add, Mul, Neg, Sub};
 pub use num_traits::identities::{one, zero, One, Zero};
@@ -23,9 +43,9 @@ trait_set! {
 
 /// For R-modules. Since this library is for commutative rings, it doesn't matter whether it's a left or right
 /// module, but we will say left for definitiveness.
-pub trait ModType<R: RingType>: AbGroupType {
+pub trait ModType<R>: AbGroupType {
     /// module multiplication $r \times m$, for $r \in R$ and $m \in M$.
-    fn mod_mul(r: R, m: Self) -> Self;
+    fn mod_mul(r: Self::Ring, m: Self) -> Self;
 }
 
 /// An R-module homomorphism $A \to B$.

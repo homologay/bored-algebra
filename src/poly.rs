@@ -1,10 +1,10 @@
 //! Polynomials
-use crate::helpers::mul_z_module;
-use crate::module::RingType;
+use crate::helpers::mul_z_module; //TODO: move this functionality to ModType implementation
+use crate::module::{ModType, RingType};
 
+use std::fmt::Debug;
 use std::iter::once;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
-use std::rc::Rc;
 
 use num_traits::identities::{One, Zero};
 
@@ -20,8 +20,8 @@ use num_traits::identities::{One, Zero};
 /// assert_eq!(p.deg(), 2_u64);
 /// assert_eq!(p.coeffs(), Rc::new(vec));
 /// ```
-#[derive(Debug, Clone)]
-pub struct Polynomial<T> {
+#[derive(Debug, Clone)] //TODO: just implement these by hand
+pub struct Polynomial<T: Debug + Clone> {
     coeffs: Vec<T>, // index == deg
     deg: u64,
 }
@@ -102,6 +102,12 @@ impl<T: RingType> Default for Polynomial<T> {
             coeffs: vec![T::zero()],
             deg: 0,
         }
+    }
+}
+
+impl<T: RingType> ModType<Polynomial<T>> for Polynomial<T> {
+    fn mod_mul(self, rhs: Self) -> Self {
+        todo!();
     }
 }
 

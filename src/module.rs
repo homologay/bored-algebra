@@ -23,6 +23,7 @@ use core::fmt::Debug;
 use core::ops::{Add, Mul, Neg, Sub};
 pub use num_traits::identities::{one, zero, One, Zero};
 use std::marker::PhantomData;
+use std::rc::Rc;
 use trait_set::trait_set;
 
 trait_set! {
@@ -45,24 +46,27 @@ trait_set! {
 /// module, but we will say left for definitiveness.
 pub trait ModType<R>: AbGroupType {
     /// module multiplication $r \times m$, for $r \in R$ and $m \in M$.
-    fn mod_mul(r: Self::Ring, m: Self) -> Self;
+    fn mod_mul(r: R, m: Self) -> Self;
 }
 
 /// An R-module homomorphism $A \to B$.
 pub struct Homo<R: RingType, A: ModType<R>, B: ModType<R>> {
     ring: PhantomData<R>,
-    function: Box<dyn Fn(A) -> B>,
+    function: Rc<dyn Fn(A) -> B>,
 }
 
 impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
     /// Returns the morphism in a way that u can apply elements to it
-    pub fn as_fn(self) -> impl Fn(A) -> B {
-        todo!();
+    pub fn as_fn(self) -> Rc<dyn Fn(A) -> B> {
+        self.function.clone()
     }
 
     /// Compose morphisms `self`$:A \to B$ and `other`$:B \to C$.
     pub fn compose<C: ModType<R>>(self, other: Homo<R, B, C>) -> Homo<R, A, C> {
-        todo!();
+        Self {
+            ring: self.ring,
+            function: Rc::new(compose_rcs_of_functions(self.function, other.function)),
+        }
     }
 }
 
@@ -70,15 +74,13 @@ impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
 impl<R: RingType, A: ModType<R>, B: ModType<R>> Add for Homo<R, A, B> {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self {
+    fn add(self, rhs: Self) -> Self 
+    {
         todo!();
     }
 }
 
-fn compose_functions<A, B, C, G, F>(g: G, f: F) -> impl Fn(A) -> C
-where
-    F: Fn(A) -> B,
-    G: Fn(B) -> C,
-{
-    move |x| g(f(x))
+fn compose_rcs_of_functions<A, B, C, G, F>(g: Rc<dyn Fn(B) -> C>, f: Rc<dyn Fn(A) -> B>) -> Rc<dyn Fn(A) -> C> {
+    // this should be something else...
+    Rc::new(move |x| g(f(x)))     
 }

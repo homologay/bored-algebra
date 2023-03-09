@@ -1,7 +1,6 @@
 //! Polynomials
 use crate::helpers::mul_z_module; //TODO: move this functionality to ModType implementation
 use crate::module::{ModType, RingType};
-
 use std::fmt::Debug;
 use std::iter::once;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
@@ -54,6 +53,11 @@ impl<T: RingType> Polynomial<T> {
         self.coeffs.clone().into_iter().take(k).collect()
     }
 
+    /// eval
+    pub fn eval(&self, val: T) -> T {
+        todo!();
+    }
+
     /// add, assuming rhs has lower or equal degree to self.
     fn add_pad_second(self, rhs: Self) -> Self {
         let pad_len = &self.deg() - &rhs.deg();
@@ -76,6 +80,10 @@ impl<T: RingType> Polynomial<T> {
                     .collect::<Vec<T>>(),
             )
         }
+    }
+
+    fn do_nothing() {
+        //formatting test
     }
 
     /// The derivative of a polynomial, given by the formula
@@ -106,7 +114,7 @@ impl<T: RingType> Default for Polynomial<T> {
 }
 
 impl<T: RingType> ModType<Polynomial<T>> for Polynomial<T> {
-    fn mod_mul(self, rhs: Self) -> Self {
+    fn mod_mul(lhs: Self, rhs: Self) -> Self {
         todo!();
     }
 }
@@ -463,5 +471,14 @@ mod test {
         let b = Polynomial::<i64>::from(vec![3, 1]);
 
         assert_eq!(Polynomial::<i64>::from(vec![12, 1, 3, 6, 2]), a * b);
+    }
+
+    #[test]
+    fn test_eval() {
+        // 1 + 3x + 2x^3
+        let a = Polynomial::<i64>::from(vec![1, 3, 2, 0, 0]);
+        let t = 4;
+
+        assert_eq!(Polynomial::<i64>::eval(&a, t), 141);
     }
 }

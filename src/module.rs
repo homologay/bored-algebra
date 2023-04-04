@@ -60,7 +60,7 @@ impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
     pub fn as_fn(self) -> Rc<dyn Fn(A) -> B> {
         self.function.clone()
     }
-
+/*
     /// Compose morphisms `self`$:A \to B$ and `other`$:B \to C$.
     pub fn compose<C: ModType<R>>(self, other: Homo<R, B, C>) -> Homo<R, A, C> {
         Self {
@@ -68,6 +68,7 @@ impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
             function: Rc::new(compose_rcs_of_functions(self.function, other.function)),
         }
     }
+    */
 }
 
 /// Add morphisms `self`, `other$:A \to B$ by elements

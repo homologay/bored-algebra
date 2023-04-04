@@ -55,7 +55,8 @@ impl<T: RingType> Polynomial<T> {
 
     /// eval
     pub fn eval(&self, val: T) -> T {
-        todo!();
+        (*self).iter()
+            .fold(0, |acc, coeff| *acc + *coeff)
     }
 
     /// add, assuming rhs has lower or equal degree to self.
@@ -82,10 +83,6 @@ impl<T: RingType> Polynomial<T> {
         }
     }
 
-    fn do_nothing() {
-        //formatting test
-    }
-
     /// The derivative of a polynomial, given by the formula
     /// $$
     /// \frac{d}{dx} \sum\_{i=0}^{n}a\_i x^i = \sum_{i=1}^{n} i a\_i x^{i-1}
@@ -102,6 +99,15 @@ impl<T: RingType> Polynomial<T> {
         )
     }
 }
+
+impl<R: RingType> IntoIterator for Polynomial<R> {
+    type Item = R;
+    type IntoIter = std::vec::IntoIter<Self::Item>; //i do not understand this
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.coeffs().into_iter()
+    }
+} 
 
 /// The default is 0
 impl<T: RingType> Default for Polynomial<T> {

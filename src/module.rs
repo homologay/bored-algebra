@@ -19,6 +19,9 @@
 //!
 //! TODO: making a ModType<Ring = Self> automatically implement ModType<Ring = BigInt>
 //! (but does this need specialization................uuuhhhhhhh)
+
+use crate::Integer;
+
 use core::fmt::Debug;
 use core::ops::{Add, Mul, Neg, Sub};
 pub use num_traits::identities::{one, zero, One, Zero};
@@ -52,20 +55,28 @@ pub trait ModType<R>: AbGroupType {
 /// An R-module homomorphism $A \to B$.
 pub struct Homo<R: RingType, A: ModType<R>, B: ModType<R>> {
     ring: PhantomData<R>,
-    function: Rc<dyn Fn(A) -> B>,
+    function: Box<dyn Fn(A) -> B>,
 }
 
 impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
     /// Returns the morphism in a way that u can apply elements to it
-    pub fn as_fn(self) -> Rc<dyn Fn(A) -> B> {
-        self.function.clone()
+    pub fn as_fn(self) -> Box<dyn Fn(A) -> B> {
+        self.function
     }
-/*
-    /// Compose morphisms `self`$:A \to B$ and `other`$:B \to C$.
-    pub fn compose<C: ModType<R>>(self, other: Homo<R, B, C>) -> Homo<R, A, C> {
+
+    pub fn new(function: Box<dyn Fn(A) -> B>) -> Self {
         Self {
-            ring: self.ring,
-            function: Rc::new(compose_rcs_of_functions(self.function, other.function)),
+            ring: PhantomData,
+            function: function,
+        }
+    } 
+
+    /*
+    /// Compose morphisms `self`$:A \to B$ and `other`$:B \to C$.
+    pub fn compose<C: ModType<R>>(self, other: Homo<R, B,C>) -> Homo<R, A, C> {
+Self {
+            function:
+    Box::new(compose_fns(other.as_fn(), self.as_fn())),
         }
     }
     */
@@ -77,11 +88,38 @@ impl<R: RingType, A: ModType<R>, B: ModType<R>> Add for Homo<R, A, B> {
 
     fn add(self, rhs: Self) -> Self 
     {
-        todo!();
+        Self {
+            ring: PhantomData,
+            function: Box::new(move |x| (self.as_fn())(x) + (rhs.as_fn())(x))
+        }
     }
 }
 
-fn compose_rcs_of_functions<A, B, C, G, F>(g: Rc<dyn Fn(B) -> C>, f: Rc<dyn Fn(A) -> B>) -> Rc<dyn Fn(A) -> C> {
-    // this should be something else...
-    Rc::new(move |x| g(f(x)))     
+fn compose_fns<A, B, C, G, F>(g: Box<dyn Fn(B) -> C>, f: Box<dyn Fn(A) -> B>) -> Box<dyn Fn(A) -> C> {
+    Box::new(move |x| g(f(x)))     
+}
+
+impl ModType<Integer> for Integer {
+    fn mod_mul(r: Integer, m: Integer) -> Integer {
+        r * m       
+    }    
+}
+
+
+#[cfg(test)]
+mod test {
+
+type ZHomo = Homo<Integer, Integer, Integer>;
+
+const HOMO_1: ZHomo = ZHomo::new(Box::new(|x| 3 * x));
+const HOMO_2: ZHomo = ZHomo::new(Box::new(|x| 2 * x));  
+
+use super::*;
+
+    #[test]
+    fn test_add() {
+        let expected = ZHomo::new(Box::new(|x| 3 * x + 2 * x));
+        assert_eq!((expected.as_fn())(Integer::one()), ((HOMO_1 + HOMO_2).as_fn())(Integer::one()));
+    }
+
 }

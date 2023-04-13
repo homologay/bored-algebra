@@ -1,5 +1,5 @@
 //! Project root
-pub use num_bigint::BigInt;
+pub use num_bigint::BigInt as Integer;
 pub mod error;
 pub mod helpers;
 pub mod limits;
@@ -9,3 +9,5 @@ pub mod poly;
 pub mod products;
 pub mod quotient;
 pub mod sub;
+
+

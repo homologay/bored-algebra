@@ -53,12 +53,13 @@ impl<T: RingType> Polynomial<T> {
         self.coeffs.clone().into_iter().take(k).collect()
     }
 
+/*
     /// eval
     pub fn eval(&self, val: T) -> T {
-        (*self).iter()
+        (*self).coeffs.iter()
             .fold(0, |acc, coeff| *acc + *coeff)
     }
-
+*/
     /// add, assuming rhs has lower or equal degree to self.
     fn add_pad_second(self, rhs: Self) -> Self {
         let pad_len = &self.deg() - &rhs.deg();

@@ -69,57 +69,60 @@ impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
             ring: PhantomData,
             function: function,
         }
-    } 
+    }
 
     /*
-    /// Compose morphisms `self`$:A \to B$ and `other`$:B \to C$.
-    pub fn compose<C: ModType<R>>(self, other: Homo<R, B,C>) -> Homo<R, A, C> {
-Self {
-            function:
-    Box::new(compose_fns(other.as_fn(), self.as_fn())),
+        /// Compose morphisms `self`$:A \to B$ and `other`$:B \to C$.
+        pub fn compose<C: ModType<R>>(self, other: Homo<R, B,C>) -> Homo<R, A, C> {
+    Self {
+                function:
+        Box::new(compose_fns(other.as_fn(), self.as_fn())),
+            }
         }
-    }
-    */
+        */
 }
 
 /// Add morphisms `self`, `other$:A \to B$ by elements
 impl<R: RingType, A: ModType<R>, B: ModType<R>> Add for Homo<R, A, B> {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self 
-    {
+    fn add(self, rhs: Self) -> Self {
         Self {
             ring: PhantomData,
-            function: Box::new(move |x| (self.as_fn())(x) + (rhs.as_fn())(x))
+            function: todo!(),
         }
     }
 }
 
-fn compose_fns<A, B, C, G, F>(g: Box<dyn Fn(B) -> C>, f: Box<dyn Fn(A) -> B>) -> Box<dyn Fn(A) -> C> {
-    Box::new(move |x| g(f(x)))     
+fn compose_fns<A, B, C, G, F>(
+    g: Box<dyn Fn(B) -> C>,
+    f: Box<dyn Fn(A) -> B>,
+) -> Box<dyn Fn(A) -> C> {
+    todo!();
 }
 
 impl ModType<Integer> for Integer {
     fn mod_mul(r: Integer, m: Integer) -> Integer {
-        r * m       
-    }    
+        r * m
+    }
 }
-
 
 #[cfg(test)]
 mod test {
 
-type ZHomo = Homo<Integer, Integer, Integer>;
+    type ZHomo = Homo<Integer, Integer, Integer>;
 
-const HOMO_1: ZHomo = ZHomo::new(Box::new(|x| 3 * x));
-const HOMO_2: ZHomo = ZHomo::new(Box::new(|x| 2 * x));  
-
-use super::*;
+    use super::*;
 
     #[test]
     fn test_add() {
-        let expected = ZHomo::new(Box::new(|x| 3 * x + 2 * x));
-        assert_eq!((expected.as_fn())(Integer::one()), ((HOMO_1 + HOMO_2).as_fn())(Integer::one()));
+        todo!();
+        // let HOMO_1: ZHomo = ZHomo::new(Box::new(|x| 3 * x));
+        // let HOMO_2: ZHomo = ZHomo::new(Box::new(|x| 2 * x));
+        // let expected = ZHomo::new(Box::new(|x| 3 * x + 2 * x));
+        // assert_eq!(
+        // (expected.as_fn())(Integer::one()),
+        // ((HOMO_1 + HOMO_2).as_fn())(Integer::one())
+        // );
     }
-
 }

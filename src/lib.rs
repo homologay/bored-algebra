@@ -9,5 +9,3 @@ pub mod poly;
 pub mod products;
 pub mod quotient;
 pub mod sub;
-
-

@@ -7,7 +7,7 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 use num_traits::identities::{One, Zero};
 
-/// A polynomial with coefficients in `T`. To do much with `Polynomial<T>`, `T` should implement `RingType`.
+/// A polynomial with coefficients in $R$. To do much with `Polynomial<R>`, `R` should implement `RingType`.
 /// # Example:
 /// ```
 /// use bored_algebra::poly::Polynomial;
@@ -25,11 +25,11 @@ pub struct Polynomial<T: Debug + Clone> {
     deg: u64,
 }
 
-impl<T: RingType> Polynomial<T> {
+impl<R: RingType> Polynomial<R> {
     pub fn deg(&self) -> u64 {
         self.deg
     }
-    pub fn coeffs(&self) -> Vec<T> {
+    pub fn coeffs(&self) -> Vec<R> {
         self.coeffs.clone()
     }
 
@@ -49,21 +49,26 @@ impl<T: RingType> Polynomial<T> {
     }
 
     /// Returns the first k coefficients of a polynomial.
-    pub fn coeffs_take(&self, k: usize) -> Vec<T> {
+    pub fn coeffs_take(&self, k: usize) -> Vec<R> {
         self.coeffs.clone().into_iter().take(k).collect()
     }
 
-/*
-    /// eval
-    pub fn eval(&self, val: T) -> T {
-        (*self).coeffs.iter()
-            .fold(0, |acc, coeff| *acc + *coeff)
+    /// Evaluation function $ev_a: R[x] \to R$, where $a \in R$.
+    pub fn eval(&self, val: R) -> R {
+        if val == R::zero() {
+            return (*self).coeffs[0].clone();
+        }
+        let ret = (*self).coeffs.iter().enumerate().collect::<Vec<(R, usize)>>();
+        dbg!(&ret);
+        ret.into_iter().fold(R::zero(), |acc, (coeff, i)| {
+            acc + int_pow((*coeff).clone(), i)
+        })
     }
-*/
+
     /// add, assuming rhs has lower or equal degree to self.
     fn add_pad_second(self, rhs: Self) -> Self {
         let pad_len = &self.deg() - &rhs.deg();
-        let zero = T::zero();
+        let zero = R::zero();
         let padding = once(&zero).cycle().take(pad_len.try_into().unwrap());
         if pad_len == 0 {
             Polynomial::from(
@@ -71,7 +76,7 @@ impl<T: RingType> Polynomial<T> {
                     .iter()
                     .zip(rhs.coeffs().iter())
                     .map(|(a, b)| (*a).clone() + (*b).clone())
-                    .collect::<Vec<T>>(),
+                    .collect::<Vec<R>>(),
             )
         } else {
             Polynomial::from(
@@ -79,7 +84,7 @@ impl<T: RingType> Polynomial<T> {
                     .iter()
                     .zip(rhs.coeffs().iter().chain(padding))
                     .map(|(a, b)| (*a).clone() + (*b).clone())
-                    .collect::<Vec<T>>(),
+                    .collect::<Vec<R>>(),
             )
         }
     }
@@ -96,7 +101,7 @@ impl<T: RingType> Polynomial<T> {
                 .enumerate()
                 .skip(1)
                 .map(|(n, a)| mul_z_module(n.try_into().unwrap(), (*a).clone()))
-                .collect::<Vec<T>>(),
+                .collect::<Vec<R>>(),
         )
     }
 }
@@ -108,7 +113,7 @@ impl<R: RingType> IntoIterator for Polynomial<R> {
     fn into_iter(self) -> Self::IntoIter {
         self.coeffs().into_iter()
     }
-} 
+}
 
 /// The default is 0
 impl<T: RingType> Default for Polynomial<T> {
@@ -323,6 +328,20 @@ impl<T: RingType> Rem for Polynomial<T> {
     }
 }
 
+/// ring element taken to integer power. This should probably be moved elsewhere
+pub fn int_pow<R: RingType>(r: R, n: usize) -> R {
+    if n == 0 {
+        return R::one();
+    } else if n == 1 {
+        return r;
+    }
+    let mut ret = r.clone();
+    for _ in 0..(n - 1) {
+        ret = ret * r.clone();
+    }
+    ret
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -481,11 +500,48 @@ mod test {
     }
 
     #[test]
-    fn test_eval() {
+    fn test_eval_1() {
         // 1 + 3x + 2x^3
-        let a = Polynomial::<i64>::from(vec![1, 3, 2, 0, 0]);
+        let a = Polynomial::<i64>::from(vec![1, 3, 0, 2]);
         let t = 4;
 
-        assert_eq!(Polynomial::<i64>::eval(&a, t), 141);
+        assert_eq!((&a).eval(4), 141);
+    }
+
+    #[test]
+    fn test_eval_2() {
+        // 1 - x + x^2
+        let a = Polynomial::<i64>::from(vec![1, -1, 1]);
+        let t = 1;
+        // should have a(t) = 1 - 1 + 1 = 1
+        assert_eq!((&a).eval(1), 1 as i64);
+    }
+
+    #[test]
+    fn test_eval_3() {
+        // 1 + x^3
+        let a = Polynomial::<i64>::from(vec![1, 0, 0, 1]);
+        assert_eq!((&a).eval(2), 1 + int_pow(2, 3));
+    }
+
+    #[test]
+    fn test_eval_zero() {
+        // 1 + x
+        let a = Polynomial::<i64>::from(vec![1, 1]);
+        // 1 - x + 2x^2 - 69x^3 + 420x^4
+        let b = Polynomial::<i64>::from(vec![1, -1, 2, -69, 420]);
+        // a(0) = b(0) = 1
+        assert_eq!((&a).eval(0), (&b).eval(0));
+        assert_eq!((&a).eval(0), 1);
+    }
+
+    #[test]
+    ///todo: move this elsewhere
+    fn test_int_pow() {
+        assert_eq!(int_pow(3, 2), 9);
+        assert_eq!(int_pow(1, 32342), 1);
+        assert_eq!(int_pow(0, 12313), 0);
+        assert_eq!(int_pow(452, 1), 452);
+        assert_eq!(int_pow(34213241, 0), 1);
     }
 }

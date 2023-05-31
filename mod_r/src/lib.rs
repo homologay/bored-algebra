@@ -1,5 +1,4 @@
-//! Project root
-pub use num_bigint::BigInt as Integer;
+pub use rug::{Integer, Assign};
 pub mod error;
 pub mod helpers;
 pub mod limits;

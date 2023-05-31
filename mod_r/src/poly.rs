@@ -55,6 +55,9 @@ impl<R: RingType> Polynomial<R> {
 
     /// Evaluation function $ev_a: R[x] \to R$, where $a \in R$.
     pub fn eval(&self, val: R) -> R {
+        todo!();
+        
+        /*
         if val == R::zero() {
             return (*self).coeffs[0].clone();
         }
@@ -63,6 +66,7 @@ impl<R: RingType> Polynomial<R> {
         ret.into_iter().fold(R::zero(), |acc, (coeff, i)| {
             acc + int_pow((*coeff).clone(), i)
         })
+        */
     }
 
     /// add, assuming rhs has lower or equal degree to self.

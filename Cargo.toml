@@ -1,17 +1,9 @@
-[package]
-name = "bored_algebra"
-version = "0.1.0"
-edition = "2021"
-authors = ["Maxine Beckie <maxbeckie@tutanota.com>"]
-description = "Yet Another Math Library"
-readme = "README.md"
-license = "MIT with restrictions"
+[workspace]
 
-[dependencies]
-thiserror = "1.0"
-num-traits = { version = "0.2.15", features = ["i128"] }
-trait-set = "0.3.0"
-num-bigint = "0.4.3"
+members = [
+  "numnumnum", 
+  "mod_r",
+  "catty",
+]
 
-[package.metadata.docs.rs]
-rustdoc-args = [ "--html-in-header", "katex-header.html" ] 
+

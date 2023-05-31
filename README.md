@@ -1,34 +1,16 @@
 # Bored Algebra
 
-Rings and things.
+## ! very incomplete ! not for anything but educational purposes at this time! (and not even that, really)
 
-## Status
+## What's here
 
-Early stages. Not much is implemented yet, and the API changes frequently.
+- Incomplete traits for modules, commutative rings, abelian groups, homomorphisms
+- Incomplete polynomial ring implementation
+- Some random algorithms based on `rug`'s numbers
+- A lot of sketches for future ideas that may or may not happen
+- Some tests of `frunk` to see if it would be a useful library to use
 
-## Motivation
-
-Most abstract algebra crates I have seen are either a complicated system of traits,
-or a concrete implementation of one specific thing. This library aims to implement general 
-constructions in commutative algebra, using only as many traits and macros as necessary. 
-From this we can get a bunch of fun things nearly for free, like finite fields (from quotients, polynomials)
-or p-adic numbers (from completions). This 'from' relation is written as '=>' below.
-
-## Documentation
-
-This library is not on `crates.io` yet, so here are the steps to view the documentation. First, clone
-the repo:
-```sh
-git clone https://github.com/maxinebeckie/bored-algebra
-cd bored-algebra
-```
-Then build the documentation with the following flags, so the LaTeX renders properly.
-```sh
-RUSTDOCFLAGS="--html-in-header src/katex-header.html" cargo doc --no-deps --open
-```
-This method is from the crate `rustdoc-katex-demo`.  
-
-## Planned features / roadmap
+## What's planned
 
 **abstractions**
 
@@ -60,7 +42,30 @@ This method is from the crate `rustdoc-katex-demo`.
 * `rand` integration to generate random elements of specific rings
 * `quickcheck` for testing that algebraic structures are what they say they are
 
+## Code structure
+
+There are currently three crates:
+
+`mod_r` is the central crate consisting of abstractions around modules over a commutative ring
+
+`numnumnum` is number theory algorithms
+
+`catty` is category theory stuff, mostly with `frunk`
+
+## Documentation
+
+This library is not on `crates.io`, so here are the steps to view the documentation. First, clone
+the repo:
+```sh
+git clone https://github.com/maxinebeckie/bored-algebra
+cd bored-algebra
+```
+Then build the documentation with the following flags, so the LaTeX renders properly.
+```sh
+RUSTDOCFLAGS="--html-in-header src/katex-header.html" cargo doc --no-deps --open
+```
+This method is from the crate `rustdoc-katex-demo`.  
+
 ## Contributing
 
-Suggestions and ideas are always welcome, but I will wait until some core features are implemented 
-before accepting pull requests and making a formal `CONTRIBUTING.md`. 
+Pretty early stages for that, but I'd take any feedback you may have :)

@@ -1,56 +1,20 @@
-# Bored Algebra
-
-## ! very incomplete ! not for anything but educational purposes at this time! (and not even that, really)
-
-## What's here
-
-- Incomplete traits for modules, commutative rings, abelian groups, homomorphisms
-- Incomplete polynomial ring implementation
-- Some random algorithms based on `rug`'s numbers
-- A lot of sketches for future ideas that may or may not happen
-- Some tests of `frunk` to see if it would be a useful library to use
+`bored-algebra` is intended to be a library for commutative algebra in rust. It's pretty early stages.  
 
 ## What's planned
 
-**abstractions**
+The idea is to be able to compute with general constructions over modules such as quotients, products, localization, tensor products, maybe arbitrary coproducts and products if the abstractions work out (they probably won't). Also included will be some ways to produce examples like polynomial rings and group rings. 
 
-* modules => rings, abelian groups
-* submodules => ideals, subgroups
-* module homomorphisms => ring and group homomorphisms
+If that stuff works out then maybe more fun things will be added like Grobner bases or algorithms to test for irreducibility. 
 
-! all rings are commutative in this house ! 
-
-**constructions**
-
-* polynomials
-* quotient modules
-* free modules
-* localization
-* tensor products
-* arbitrary products => inverse limits => completions
-* arbitrary disjoint unions => direct limits => some cursed stuff, apparently
-
-**homological things**
-
-* chain complexes of modules
-* homology of a chain complex
-* hom functor
-* cohomology of a chain complex
-
-**programming things**
-
-* `rand` integration to generate random elements of specific rings
-* `quickcheck` for testing that algebraic structures are what they say they are
+I am aiming to have few dependencies. I will use `thiserror` for error handling and I am experimenting with the libraries `rug`, `frunk`, and `quickcheck`, to see if they may be useful for this project. 
 
 ## Code structure
 
-There are currently three crates:
+There are currently two crates:
 
-`mod_r` is the central crate consisting of abstractions around modules over a commutative ring
+`mod_r` is the central crate consisting of abstractions and constructions around modules over a commutative ring
 
-`numnumnum` is number theory algorithms
-
-`catty` is category theory stuff, mostly with `frunk`
+`cat` is experimenting with `frunk` 
 
 ## Documentation
 

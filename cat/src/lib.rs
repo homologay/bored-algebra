@@ -1,3 +1,4 @@
+/*
 mod hmm;
 
 use frunk;
@@ -47,3 +48,4 @@ pub fn n_prod<T>(a: T, n: Natural) {
     // the problem here is: can Integer become iterable for Hlist??? can we make
     // Integer into a Vec<u64> s.t. sums to itself?
 }
+*/

@@ -1,3 +1,5 @@
+/*
+
 use frunk_core::{hlist, hlist::HList, poly_fn, Coprod, HList};
 
 #[cfg(test)]
@@ -24,3 +26,4 @@ mod test {
         assert_eq!(mapped, hlist![3, 1]);
     }
 }
+*/

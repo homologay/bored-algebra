@@ -82,6 +82,18 @@ impl<R: RingType, A: ModType<R>, B: ModType<R>> Homo<R, A, B> {
         */
 }
 
+/// Returns `a` to the power of `i`, defined as multiplying `a` by itself `i` times. Returns an error for negative `i`. 
+pub fn pow<R: RingType>(a: R, i: usize) -> R { //TODO change usize to Integer, but not sure how to iterate over them (or if it is wise). Or maybe i will need to implement my own bigint lol
+    if i < 0 {
+        println!("error!"); //TODO handle this
+        a
+    } else if i == 0 {
+        R::one()
+    } else {
+        (0..i).into_iter().fold(R::one(), |acc, x| acc * a.clone()) //TODO make less horribly inefficient 
+    }
+}
+
 /// Add morphisms `self`, `other$:A \to B$ by elements
 impl<R: RingType, A: ModType<R>, B: ModType<R>> Add for Homo<R, A, B> {
     type Output = Self;
@@ -100,12 +112,15 @@ fn compose_fns<A, B, C, G, F>(
 ) -> Box<dyn Fn(A) -> C> {
     todo!();
 }
-
+/*
 impl ModType<Integer> for Integer {
     fn mod_mul(r: Integer, m: Integer) -> Integer {
         r * m
     }
 }
+
+*/
+
 
 #[cfg(test)]
 mod test {

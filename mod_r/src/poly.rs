@@ -1,6 +1,6 @@
 //! Polynomials
 use crate::helpers::mul_z_module; //TODO: move this functionality to ModType implementation
-use crate::module::{ModType, RingType};
+use crate::module::{ModType, RingType, pow};
 use std::fmt::Debug;
 use std::iter::once;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
@@ -53,20 +53,15 @@ impl<R: RingType> Polynomial<R> {
         self.coeffs.clone().into_iter().take(k).collect()
     }
 
-    /// Evaluation function $ev_a: R[x] \to R$, where $a \in R$.
-    pub fn eval(&self, val: R) -> R {
-        todo!();
-        
-        /*
-        if val == R::zero() {
-            return (*self).coeffs[0].clone();
+    /// Evaluates `self` at `a`. This is how we consider an abstract polynomial to be a function. 
+    pub fn eval(&self, a: R) -> R {
+        if a == R::zero() {
+            return (&self).coeffs().into_iter().nth(0).unwrap();
+            // safe to unwrap since poly's cannot have empty coeffs if made by constructor
+        } else {
+            return (&self).coeffs().into_iter().enumerate().skip(1)
+            .fold(a, |acc, (i, coeff)| acc + pow(coeff, i));
         }
-        let ret = (*self).coeffs.iter().enumerate().collect::<Vec<(R, usize)>>();
-        dbg!(&ret);
-        ret.into_iter().fold(R::zero(), |acc, (coeff, i)| {
-            acc + int_pow((*coeff).clone(), i)
-        })
-        */
     }
 
     /// add, assuming rhs has lower or equal degree to self.

@@ -1,9 +1,9 @@
 [workspace]
+workspace-resolver = '2'
 
 members = [
-  "numnumnum", 
   "mod_r",
-  "catty",
+  "cat",
 ]
 
 

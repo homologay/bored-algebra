@@ -11,22 +11,12 @@ I wanted to learn rust's type system in more depth and see how well it works for
 - use of graphics libraries to plot intersections of surfaces, other algebraic geometry applications
 - category-theoretic approaches, abelian categories
 
-It is unlikely this project will progress that far. They are left as an exercise for the reader (haha). 
+They are left as exercises for the reader (haha). 
 
 ## How to view the documentation
 
-This library is not on `crates.io`, so here are the steps to view the documentation. First, clone
-the repo:
-```sh
-git clone https://github.com/homologay/bored-algebra
-cd bored-algebra
-```
-Then build the documentation with the following flags, so the LaTeX renders properly.
+Build with the following flags, so the KaTeX renders properly.
 ```sh
 RUSTDOCFLAGS="--html-in-header mod_r/src/katex-header.html" cargo doc --no-deps --open
 ```
-This method is from the crate `rustdoc-katex-demo`.  
-
-## Contributing
-
-Pretty early stages for that, but I'd take any feedback you may have :)
+This is from the crate `rustdoc-katex-demo`.  

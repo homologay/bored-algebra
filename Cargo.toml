@@ -1,9 +1,14 @@
-[workspace]
-workspace-resolver = '2'
+[package]
+name = "bored_algebra"
+version = "0.2.0"
+edition = "2021"
+description = "Yet Another Math Library"
+readme = "README.md"
+license = "MIT with restrictions"
 
-members = [
-  "mod_r",
-  "cat",
-]
-
-
+[dependencies]
+thiserror = "1.0"
+num-traits = { version = "0.2.15", features = ["i128"] }
+trait-set = "0.3.0"
+num-bigint = "0.4.3"
+rug = "1.19.2"

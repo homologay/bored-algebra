@@ -88,6 +88,14 @@ impl<R: RingType> Polynomial<R> {
         }
     }
 
+    /// Returns the roots of the polynomial. This is a stub function that represents several implementation ideas.
+    /// 1. complex solutions by radicals for polynomials with real or complex (ie. arbitrary precision floats) numbers, for polynomials with deg < 5. For > 5, the solutions will have to be more brute-force or advanced. For the reason for this, see any intro textbook to Galois theory. 
+    /// 2. solutions mod p, in $F_{p^n}$,  
+    /// 3. A funcion to check if a given ring element is a root of a polynomial. May use faster methods than 1.
+    pub fn roots(self) -> Vec<R> {
+        todo!();
+    }
+
     /// The derivative of a polynomial, given by the formula
     /// $$
     /// \frac{d}{dx} \sum\_{i=0}^{n}a\_i x^i = \sum_{i=1}^{n} i a\_i x^{i-1}
